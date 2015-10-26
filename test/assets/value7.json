@@ -1,0 +1,19 @@
+{
+  "data": [
+    {
+      "nf": null
+    },
+    {
+      "tf": true
+    },
+    {
+      "ff": false
+    },
+    {
+      "nf": 213
+    },
+    {
+      "sf": "Hello world!"
+    }
+  ]
+}

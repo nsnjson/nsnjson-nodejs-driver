@@ -1,0 +1,28 @@
+{
+  "name": "nsnjson-driver",
+  "version": "0.0.1",
+  "description": "NSNJSON (Not So Normal JSON) Driver",
+  "author": "Maks Atygaev <jxcoder@ya.ru>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nsnjson/nsnjson-nodejs-driver"
+  },
+  "bugs": {
+    "url": "https://github.com/nsnjson/nsnjson-nodejs-driver/issues"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "engines": {
+    "node": "0.10.0"
+  },
+  "keywords": [
+    "nsnjson",
+    "json",
+    "driver"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^2.3.3"
+  }
+}
