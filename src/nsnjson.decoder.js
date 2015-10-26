@@ -66,30 +66,51 @@ function decodeObject(presentation) {
   }
 };
 
-function decode(presentation) {
-  var presentationType = type(presentation);
+function checkerByType(type) {
+  return function(presentation) {
+    return presentation.t == type;
+  };
+};
 
-  if (presentationType == Types.NULL) {
-    return decodeNull(presentation);
+var resolvers = [
+  {
+    checker: checkerByType(Types.NULL),
+    decoder: decodeNull
+  },
+  {
+    checker: checkerByType(Types.BOOLEAN),
+    decoder: decodeBoolean
+  },
+  {
+    checker: checkerByType(Types.NUMBER),
+    decoder: decodeNumber
+  },
+  {
+    checker: checkerByType(Types.STRING),
+    decoder: decodeString
+  },
+  {
+    checker: checkerByType(Types.ARRAY),
+    decoder: decodeArray
+  },
+  {
+    checker: checkerByType(Types.OBJECT),
+    decoder: decodeObject
   }
-  else if (presentationType == 'boolean') {
-    return decodeBoolean(presentation);
+];
+
+var resolversCount = resolvers.length;
+
+function decode(presentation) {
+  for (var i = 0; i < resolversCount; i++) {
+    var resolver = resolvers[i];
+
+    if (resolver.checker(presentation)) {
+      return resolver.decoder(presentation);
+    }
   }
-  else if (presentationType == 'number') {
-    return decodeNumber(presentation);
-  }
-  else if (presentationType == 'string') {
-    return decodeString(presentation);
-  }
-  else if (presentationType == 'array') {
-    return decodeArray(presentation);
-  }
-  else if (presentationType == 'object') {
-    return decodeObject(presentation);
-  }
-  else {
-    throw 'Unknown type ' + JSON.stringify({presentation: presentation, type: presentation.t});
-  }
+
+  throw 'Unknown type ' + JSON.stringify({presentation: presentation, type: presentation.t});
 };
 
 module.exports = {
