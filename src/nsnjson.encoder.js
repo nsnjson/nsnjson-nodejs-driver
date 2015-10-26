@@ -63,31 +63,66 @@ function encodeObject(object) {
   };
 };
 
+function isNull(value) {
+  return (value == null);
+};
+
+function isBoolean(value) {
+  return (typeof(value) == 'boolean') || (value instanceof Boolean);
+};
+
+function isNumber(value) {
+  return (typeof(value) == 'number') || (value instanceof Number);
+};
+
+function isString(value) {
+  return (typeof(value) == 'string') || (value instanceof String);
+};
+
+function isArray(value) {
+  return (value instanceof Array);
+};
+
+function isObject(value) {
+  return (value instanceof Object);
+};
+
+var resolvers = [
+  {
+    checker: isNull,
+    encoder: encodeNull
+  },
+  {
+    checker: isBoolean,
+    encoder: encodeBoolean
+  },
+  {
+    checker: isNumber,
+    encoder: encodeNumber
+  },
+  {
+    checker: isString,
+    encoder: encodeString
+  },
+  {
+    checker: isArray,
+    encoder: encodeArray
+  },
+  {
+    checker: isObject,
+    encoder: encodeObject
+  }
+];
+
+var resolversCount = resolvers.length;
+
 function encode(value) {
-  if (value == null) {
-    return encodeNull();
-  }
+  for (var i = 0; i < resolversCount; i++) {
+    var resolver = resolvers[i];
 
-  var valueType = typeof(value);
-
-  if (valueType == 'boolean') {
-    return encodeBoolean(value);
-  }
-
-  if (valueType == 'number') {
-    return encodeNumber(value);
-  }
-
-  if (valueType == 'string') {
-    return encodeString(value);
-  }
-
-  if (value instanceof Array) {
-    return encodeArray(value);
-  }
-
-  if (value instanceof Object) {
-    return encodeObject(value);
+    if (resolver.checker(value)) {
+      return resolver.encoder(value);
+    }
   }
 
   throw 'Unknown type ' + JSON.stringify({value: value, type: valueType});
