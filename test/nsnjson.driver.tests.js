@@ -2,10 +2,6 @@ var assert = require("assert");
 
 var Driver = require('../src/nsnjson.driver');
 
-var Encoder = Driver.encoder;
-
-var Decoder = Driver.decoder;
-
 var Assets = require('./nsnjson.tests.assets');
 
 describe('Driver @ consistency', function() {
@@ -13,7 +9,7 @@ describe('Driver @ consistency', function() {
     var toString = JSON.stringify;
 
     it(toString(value), function() {
-      var actualValue = Decoder.decode(Encoder.encode(value));
+      var actualValue = Driver.decode(Driver.encode(value));
 
       assert.equal(toString(value), toString(actualValue));
     });
