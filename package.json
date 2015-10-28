@@ -24,5 +24,8 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "^2.3.3"
+  },
+  "dependencies": {
+    "data.maybe": "^1.2.1"
   }
 }
