@@ -1,0 +1,8 @@
+{
+  "data": "Hello world!",
+
+  "presentation": {
+    "t": "string",
+    "v": "Hello world!"
+  }
+}
