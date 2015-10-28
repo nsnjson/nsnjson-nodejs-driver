@@ -1,8 +1,4 @@
 {
-  "t": "object",
-  "v": [{
-    "n": "data",
-    "t": "string",
-    "v": "Hello world!"
-  }]
+  "t": "string",
+  "v": "Hello world!"
 }
