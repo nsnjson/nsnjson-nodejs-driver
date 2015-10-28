@@ -16,6 +16,8 @@ describe('Decoder @ decode', function() {
   };
 
   for (var i = 0; i < Assets.size; i++) {
-    testDecoding(Assets.presentations[i], Assets.values[i]);
+    var asset = Assets.assets[i];
+
+    testDecoding(asset.presentation, asset.data);
   }
 });
