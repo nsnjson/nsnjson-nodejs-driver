@@ -16,6 +16,6 @@ describe('Driver @ consistency', function() {
   };
 
   for (var i = 0; i < Assets.size; i++) {
-    testConsistency(Assets.values[i]);
+    testConsistency(Assets.assets[i].data);
   }
 });
