@@ -7,7 +7,7 @@ var values = [];
 var presentations = [];
 
 for (var i = 1; i <= assetsCount; i++) {
-  if (i > 1) {
+  if (i > 2) {
     values.push(require(path + 'value' + i + '.json'));
 
     presentations.push(require(path + 'value' + i + 'presentation.json'));
