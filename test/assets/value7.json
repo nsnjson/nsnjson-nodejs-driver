@@ -1,7 +1,0 @@
-{
-  "null_field": null,
-  "true_field": true,
-  "false_field": false,
-  "number_field": 213,
-  "string_field": "Hello world!"
-}

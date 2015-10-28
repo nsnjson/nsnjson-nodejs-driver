@@ -7,17 +7,11 @@ var values = [];
 var presentations = [];
 
 for (var i = 1; i <= assetsCount; i++) {
-  if (i > 6) {
-    values.push(require(path + 'value' + i + '.json'));
+  var asset = require(path + 'asset' + i + '.json');
 
-    presentations.push(require(path + 'value' + i + 'presentation.json'));
-  } else {
-    var asset = require(path + 'asset' + i + '.json');
+  values.push(asset.data);
 
-    values.push(asset.data);
-
-    presentations.push(asset.presentation);
-  }
+  presentations.push(asset.presentation);
 }
 
 module.exports = {
