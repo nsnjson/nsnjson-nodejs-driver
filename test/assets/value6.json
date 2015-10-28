@@ -1,9 +1,7 @@
-{
-  "data": [
-    null,
-    true,
-    false,
-    213,
-    "Hello world!"
-  ]
-}
+[
+  null,
+  true,
+  false,
+  213,
+  "Hello world!"
+]
