@@ -1,8 +1,4 @@
 {
-  "t": "object",
-  "v": [{
-    "n": "data",
-    "t": "boolean",
-    "v": 1
-  }]
+  "t": "boolean",
+  "v": 1
 }
