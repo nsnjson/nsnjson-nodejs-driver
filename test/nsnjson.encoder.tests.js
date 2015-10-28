@@ -16,6 +16,8 @@ describe('Encoder @ encode', function() {
   };
 
   for (var i = 0; i < Assets.size; i++) {
-    testEncoding(Assets.values[i], Assets.presentations[i]);
+    var asset = Assets.assets[i];
+
+    testEncoding(asset.data, asset.presentation);
   }
 });
