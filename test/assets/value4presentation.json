@@ -1,8 +1,4 @@
 {
-  "t": "object",
-  "v": [{
-    "n": "data",
-    "t": "number",
-    "v": 213
-  }]
+  "t": "number",
+  "v": 213
 }
