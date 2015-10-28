@@ -1,48 +1,29 @@
 {
   "t": "object",
-  "v": [{
-    "n": "data",
-    "t": "array",
-    "v": [
-      {
-        "t": "object",
-        "v": [{
-          "n": "nf",
-          "t": "null"
-        }]
-      },
-      {
-        "t": "object",
-        "v": [{
-          "n": "tf",
-          "t": "boolean",
-          "v": 1
-        }]
-      },
-      {
-        "t": "object",
-        "v":[{
-          "n": "ff",
-          "t": "boolean",
-          "v":0
-        }]
-      },
-      {
-        "t": "object",
-        "v":[{
-          "n": "nf",
-          "t": "number",
-          "v": 213
-        }]
-      },
-      {
-        "t": "object",
-        "v": [{
-          "n":"sf",
-          "t":"string",
-          "v":"Hello world!"
-        }]
-      }
-    ]
-  }]
+  "v": [
+    {
+      "n": "null_field",
+      "t": "null"
+    },
+    {
+      "n": "true_field",
+      "t": "boolean",
+      "v": 1
+    },
+    {
+      "n": "false_field",
+      "t": "boolean",
+      "v": 0
+    },
+    {
+       "n": "number_field",
+       "t": "number",
+       "v": 213
+    },
+    {
+      "n": "string_field",
+      "t": "string",
+      "v": "Hello world!"
+    }
+  ]
 }

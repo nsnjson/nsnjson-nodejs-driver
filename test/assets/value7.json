@@ -1,19 +1,7 @@
 {
-  "data": [
-    {
-      "nf": null
-    },
-    {
-      "tf": true
-    },
-    {
-      "ff": false
-    },
-    {
-      "nf": 213
-    },
-    {
-      "sf": "Hello world!"
-    }
-  ]
+  "null_field": null,
+  "true_field": true,
+  "false_field": false,
+  "number_field": 213,
+  "string_field": "Hello world!"
 }
