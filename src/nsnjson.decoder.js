@@ -116,5 +116,7 @@ function decode(presentation) {
 };
 
 module.exports = {
-  decode: decode
+  decode: function(presentation) {
+    return decode(presentation);
+  }
 };
