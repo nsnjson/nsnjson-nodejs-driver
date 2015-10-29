@@ -80,7 +80,7 @@ var resolvers = [
     decoder: decodeNull
   },
   {
-    checker: checkerByType(Format.BOOLEAN),
+    checker: checkerByType(Format.TYPE_MARKER_BOOLEAN),
     decoder: decodeBoolean
   },
   {

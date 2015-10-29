@@ -10,7 +10,7 @@ function encodeNull() {
 
 function encodeBoolean(value) {
   return Maybe.Just({
-    t: Format.BOOLEAN,
+    t: Format.TYPE_MARKER_BOOLEAN,
     v: ~~value
   });
 };
