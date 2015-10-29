@@ -144,5 +144,7 @@ function encode(value) {
 };
 
 module.exports = {
-  encode: encode
+  encode: function(value) {
+    return encode(value);
+  }
 };
