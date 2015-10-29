@@ -2,18 +2,20 @@ var path = './assets/';
 
 var assetsCount = 7;
 
-var values = [];
+var assets = [];
 
 var presentations = [];
 
 for (var i = 1; i <= assetsCount; i++) {
-  values.push(require(path + 'value' + i + '.json'));
+  var asset = require(path + 'asset' + i + '.json');
 
-  presentations.push(require(path + 'value' + i + 'presentation.json'));
+  presentations.push(asset.presentation);
+
+  assets.push(asset);
 }
 
 module.exports = {
   size: assetsCount,
-  values: values,
+  assets: assets,
   presentations: presentations
 };

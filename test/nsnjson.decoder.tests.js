@@ -6,16 +6,20 @@ var Assets = require('./nsnjson.tests.assets');
 
 describe('Decoder @ decode', function() {
   function testDecoding(presentation, value) {
-    var toString = JSON.stringify;
+    it(JSON.stringify(value), function() {
+      var actualValueMaybe = Decoder.decode(presentation);
 
-    it(toString(value), function() {
-      var actualValue = Decoder.decode(presentation);
+      assert.equal(actualValueMaybe.isJust, true);
 
-      assert.equal(toString(value), toString(actualValue));
+      var actualValue = actualValueMaybe.get();
+
+      assert.deepEqual(value, actualValue);
     });
   };
 
   for (var i = 0; i < Assets.size; i++) {
-    testDecoding(Assets.presentations[i], Assets.values[i]);
+    var asset = Assets.assets[i];
+
+    testDecoding(asset.presentation, asset.data);
   }
 });

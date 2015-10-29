@@ -6,16 +6,20 @@ var Assets = require('./nsnjson.tests.assets');
 
 describe('Encoder @ encode', function() {
   function testEncoding(value, presentation) {
-    var toString = JSON.stringify;
+    it(JSON.stringify(value), function() {
+      var actualPresentationMaybe = Encoder.encode(value);
 
-    it(toString(value), function() {
-      var actualPresentation = Encoder.encode(value);
+      assert.equal(actualPresentationMaybe.isJust, true);
 
-      assert.equal(toString(presentation), toString(actualPresentation));
+      var actualPresentation = actualPresentationMaybe.get();
+
+      assert.deepEqual(presentation, actualPresentation);
     });
   };
 
   for (var i = 0; i < Assets.size; i++) {
-    testEncoding(Assets.values[i], Assets.presentations[i]);
+    var asset = Assets.assets[i];
+
+    testEncoding(asset.data, asset.presentation);
   }
 });

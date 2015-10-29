@@ -1,45 +1,51 @@
-var Types = require('./nsnjson.types');
+var Maybe = require('data.maybe');
+
+var Format = require('./nsnjson.format');
 
 function encodeNull() {
-  return {
-    t: Types.NULL
-  };
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_NULL
+  });
 };
 
 function encodeBoolean(value) {
-  return {
-    t: Types.BOOLEAN,
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_BOOLEAN,
     v: ~~value
-  };
+  });
 };
 
 function encodeNumber(value) {
-  return {
-    t: Types.NUMBER,
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_NUMBER,
     v: value
-  };
+  });
 };
 
 function encodeString(value) {
-  return {
-    t: Types.STRING,
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_STRING,
     v: value
-  };
+  });
 }; 
 
 function encodeArray(array) {
   var encodedItems = [];
 
   for (var i = 0, size = array.length; i < size; i++) {
-    var encodedItem = encode(array[i]);
+    var encodedItemMaybe = encode(array[i]);
 
-    encodedItems.push(encodedItem);
+    if (encodedItemMaybe.isJust) {
+      var encodedItem = encodedItemMaybe.get();
+
+      encodedItems.push(encodedItem);
+    }
   }
 
-  return {
-    t: Types.ARRAY,
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_ARRAY,
     v: encodedItems
-  };
+  });
 };
 
 function encodeObject(object) {
@@ -47,50 +53,94 @@ function encodeObject(object) {
 
   for (var key in object) {
     if (object.hasOwnProperty(key)) {
-      var encodedField = encode(object[key]);
+      var encodedValueMaybe = encode(object[key]);
 
-      encodedFields.push({
-        n: key,
-        t: encodedField.t,
-        v: encodedField.v
-      });
+      if (encodedValueMaybe.isJust) {
+        var encodedValue = encodedValueMaybe.get();
+
+        var encodedField = {
+          n: key,
+          t: encodedValue.t
+        };
+
+        if (encodedValue.hasOwnProperty('v')) {
+          encodedField.v = encodedValue.v;
+        }
+
+        encodedFields.push(encodedField);
+      }
     }
   }
 
-  return {
-    t: Types.OBJECT,
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_OBJECT,
     v: encodedFields
-  };
+  });
 };
 
+function isNull(value) {
+  return (value == null);
+};
+
+function isBoolean(value) {
+  return (typeof(value) == 'boolean') || (value instanceof Boolean);
+};
+
+function isNumber(value) {
+  return (typeof(value) == 'number') || (value instanceof Number);
+};
+
+function isString(value) {
+  return (typeof(value) == 'string') || (value instanceof String);
+};
+
+function isArray(value) {
+  return (value instanceof Array);
+};
+
+function isObject(value) {
+  return (value instanceof Object);
+};
+
+var resolvers = [
+  {
+    checker: isNull,
+    encoder: encodeNull
+  },
+  {
+    checker: isBoolean,
+    encoder: encodeBoolean
+  },
+  {
+    checker: isNumber,
+    encoder: encodeNumber
+  },
+  {
+    checker: isString,
+    encoder: encodeString
+  },
+  {
+    checker: isArray,
+    encoder: encodeArray
+  },
+  {
+    checker: isObject,
+    encoder: encodeObject
+  }
+];
+
+var resolversCount = resolvers.length;
+
 function encode(value) {
-  if (value == null) {
-    return encodeNull();
+  for (var i = 0; i < resolversCount; i++) {
+    var resolver = resolvers[i];
+
+    if (resolver.checker(value)) {
+      return resolver.encoder(value);
+    }
   }
 
-  var valueType = typeof(value);
-
-  if (valueType == 'boolean') {
-    return encodeBoolean(value);
-  }
-
-  if (valueType == 'number') {
-    return encodeNumber(value);
-  }
-
-  if (valueType == 'string') {
-    return encodeString(value);
-  }
-
-  if (value instanceof Array) {
-    return encodeArray(value);
-  }
-
-  if (value instanceof Object) {
-    return encodeObject(value);
-  }
-
-  throw 'Unknown type ' + JSON.stringify({value: value, type: valueType});
+  return Maybe.Nothing();
 };
 
 module.exports = {
