@@ -24,7 +24,7 @@ function encodeNumber(value) {
 
 function encodeString(value) {
   return Maybe.Just({
-    t: Format.STRING,
+    t: Format.TYPE_MARKER_STRING,
     v: value
   });
 }; 

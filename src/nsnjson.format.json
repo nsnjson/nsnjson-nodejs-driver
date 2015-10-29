@@ -1,7 +1,7 @@
 {
   "TYPE_MARKER_NULL": 0,
   "TYPE_MARKER_NUMBER": 1,
-  "STRING": 2,
+  "TYPE_MARKER_STRING": 2,
   "BOOLEAN": 3,
   "ARRAY": 4,
   "OBJECT": 5
