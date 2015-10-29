@@ -73,7 +73,7 @@ function encodeObject(object) {
   }
 
   return Maybe.Just({
-    t: Format.OBJECT,
+    t: Format.TYPE_MARKER_OBJECT,
     v: encodedFields
   });
 };

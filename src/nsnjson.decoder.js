@@ -96,7 +96,7 @@ var resolvers = [
     decoder: decodeArray
   },
   {
-    checker: checkerByType(Format.OBJECT),
+    checker: checkerByType(Format.TYPE_MARKER_OBJECT),
     decoder: decodeObject
   }
 ];
