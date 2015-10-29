@@ -2,7 +2,7 @@
   "data": "Hello world!",
 
   "presentation": {
-    "t": "string",
+    "t": 2,
     "v": "Hello world!"
   }
 }

@@ -8,30 +8,30 @@
   },
 
   "presentation": {
-    "t": "object",
+    "t": 5,
     "v": [
       {
         "n": "null_field",
-        "t": "null"
+        "t": 0
       },
       {
         "n": "true_field",
-        "t": "boolean",
+        "t": 3,
         "v": 1
       },
       {
         "n": "false_field",
-        "t": "boolean",
+        "t": 3,
         "v": 0
       },
       {
          "n": "number_field",
-         "t": "number",
+         "t": 1,
          "v": 213
       },
       {
         "n": "string_field",
-        "t": "string",
+        "t": 2,
         "v": "Hello world!"
       }
     ]

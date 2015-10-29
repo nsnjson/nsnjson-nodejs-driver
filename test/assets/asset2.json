@@ -2,7 +2,7 @@
   "data": true,
 
   "presentation": {
-    "t": "boolean",
+    "t": 3,
     "v": 1
   }
 }

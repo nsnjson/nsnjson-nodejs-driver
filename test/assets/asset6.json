@@ -8,25 +8,25 @@
   ],
 
   "presentation": {
-    "t": "array",
+    "t": 4,
     "v": [
       {
-        "t": "null"
+        "t": 0
       },
       {
-        "t": "boolean",
+        "t": 3,
         "v": 1
       },
       {
-        "t": "boolean",
+        "t": 3,
         "v": 0
       },
       {
-        "t": "number",
+        "t": 1,
         "v": 213
       },
       {
-        "t": "string",
+        "t": 2,
         "v": "Hello world!"
       }
     ]
