@@ -84,7 +84,7 @@ var resolvers = [
     decoder: decodeBoolean
   },
   {
-    checker: checkerByType(Format.NUMBER),
+    checker: checkerByType(Format.TYPE_MARKER_NUMBER),
     decoder: decodeNumber
   },
   {

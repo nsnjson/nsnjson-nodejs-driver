@@ -17,7 +17,7 @@ function encodeBoolean(value) {
 
 function encodeNumber(value) {
   return Maybe.Just({
-    t: Format.NUMBER,
+    t: Format.TYPE_MARKER_NUMBER,
     v: value
   });
 };

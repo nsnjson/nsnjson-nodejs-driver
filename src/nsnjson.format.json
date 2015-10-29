@@ -1,6 +1,6 @@
 {
   "TYPE_MARKER_NULL": 0,
-  "NUMBER": 1,
+  "TYPE_MARKER_NUMBER": 1,
   "STRING": 2,
   "BOOLEAN": 3,
   "ARRAY": 4,
