@@ -1,6 +1,6 @@
 var Maybe = require('data.maybe');
 
-var Types = require('./nsnjson.types.js');
+var Format = require('./nsnjson.format');
 
 function decodeNull(presentation) {
   return Maybe.Just(null);
@@ -76,27 +76,27 @@ function checkerByType(type) {
 
 var resolvers = [
   {
-    checker: checkerByType(Types.NULL),
+    checker: checkerByType(Format.NULL),
     decoder: decodeNull
   },
   {
-    checker: checkerByType(Types.BOOLEAN),
+    checker: checkerByType(Format.BOOLEAN),
     decoder: decodeBoolean
   },
   {
-    checker: checkerByType(Types.NUMBER),
+    checker: checkerByType(Format.NUMBER),
     decoder: decodeNumber
   },
   {
-    checker: checkerByType(Types.STRING),
+    checker: checkerByType(Format.STRING),
     decoder: decodeString
   },
   {
-    checker: checkerByType(Types.ARRAY),
+    checker: checkerByType(Format.ARRAY),
     decoder: decodeArray
   },
   {
-    checker: checkerByType(Types.OBJECT),
+    checker: checkerByType(Format.OBJECT),
     decoder: decodeObject
   }
 ];

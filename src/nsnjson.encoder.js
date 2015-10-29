@@ -1,30 +1,30 @@
 var Maybe = require('data.maybe');
 
-var Types = require('./nsnjson.types');
+var Format = require('./nsnjson.format');
 
 function encodeNull() {
   return Maybe.Just({
-    t: Types.NULL
+    t: Format.NULL
   });
 };
 
 function encodeBoolean(value) {
   return Maybe.Just({
-    t: Types.BOOLEAN,
+    t: Format.BOOLEAN,
     v: ~~value
   });
 };
 
 function encodeNumber(value) {
   return Maybe.Just({
-    t: Types.NUMBER,
+    t: Format.NUMBER,
     v: value
   });
 };
 
 function encodeString(value) {
   return Maybe.Just({
-    t: Types.STRING,
+    t: Format.STRING,
     v: value
   });
 }; 
@@ -43,7 +43,7 @@ function encodeArray(array) {
   }
 
   return Maybe.Just({
-    t: Types.ARRAY,
+    t: Format.ARRAY,
     v: encodedItems
   });
 };
@@ -73,7 +73,7 @@ function encodeObject(object) {
   }
 
   return Maybe.Just({
-    t: Types.OBJECT,
+    t: Format.OBJECT,
     v: encodedFields
   });
 };
