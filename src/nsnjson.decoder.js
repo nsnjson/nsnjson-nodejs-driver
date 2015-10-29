@@ -101,10 +101,8 @@ var resolvers = [
   }
 ];
 
-var resolversCount = resolvers.length;
-
 function decode(presentation) {
-  for (var i = 0; i < resolversCount; i++) {
+  for (var i = 0, size = resolvers.length; i < size; i++) {
     var resolver = resolvers[i];
 
     if (resolver.checker(presentation)) {
