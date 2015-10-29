@@ -43,7 +43,7 @@ function encodeArray(array) {
   }
 
   return Maybe.Just({
-    t: Format.ARRAY,
+    t: Format.TYPE_MARKER_ARRAY,
     v: encodedItems
   });
 };

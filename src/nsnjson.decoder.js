@@ -92,7 +92,7 @@ var resolvers = [
     decoder: decodeString
   },
   {
-    checker: checkerByType(Format.ARRAY),
+    checker: checkerByType(Format.TYPE_MARKER_ARRAY),
     decoder: decodeArray
   },
   {
