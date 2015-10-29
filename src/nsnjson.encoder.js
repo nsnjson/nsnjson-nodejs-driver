@@ -102,39 +102,41 @@ function isObject(value) {
   return (value instanceof Object);
 };
 
-var resolvers = [
-  {
+var resolvers = {
+  'null': {
     checker: isNull,
     encoder: encodeNull
   },
-  {
-    checker: isBoolean,
-    encoder: encodeBoolean
-  },
-  {
+  'number': {
     checker: isNumber,
     encoder: encodeNumber
   },
-  {
+  'string': {
     checker: isString,
     encoder: encodeString
   },
-  {
+  'boolean': {
+    checker: isBoolean,
+    encoder: encodeBoolean
+  },
+  'array': {
     checker: isArray,
     encoder: encodeArray
   },
-  {
+  'object': {
     checker: isObject,
     encoder: encodeObject
   }
-];
+};
 
 function encode(value) {
-  for (var i = 0, size = resolvers.length; i < size; i++) {
-    var resolver = resolvers[i];
+  for (var resolverName in resolvers) {
+    if (resolvers.hasOwnProperty(resolverName)) {
+      var resolver = resolvers[resolverName];
 
-    if (resolver.checker(value)) {
-      return resolver.encoder(value);
+      if (resolver.checker(value)) {
+        return resolver.encoder(value);
+      }
     }
   }
 
