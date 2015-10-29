@@ -6,12 +6,14 @@ var Assets = require('./nsnjson.tests.assets');
 
 describe('Decoder @ decode', function() {
   function testDecoding(presentation, value) {
-    var toString = JSON.stringify;
+    it(JSON.stringify(value), function() {
+      var actualValueMaybe = Decoder.decode(presentation);
 
-    it(toString(value), function() {
-      var actualValue = Decoder.decode(presentation);
+      assert.equal(actualValueMaybe.isJust, true);
 
-      assert.equal(toString(value), toString(actualValue));
+      var actualValue = actualValueMaybe.get();
+
+      assert.deepEqual(value, actualValue);
     });
   };
 

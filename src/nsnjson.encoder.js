@@ -1,45 +1,51 @@
+var Maybe = require('data.maybe');
+
 var Types = require('./nsnjson.types');
 
 function encodeNull() {
-  return {
+  return Maybe.Just({
     t: Types.NULL
-  };
+  });
 };
 
 function encodeBoolean(value) {
-  return {
+  return Maybe.Just({
     t: Types.BOOLEAN,
     v: ~~value
-  };
+  });
 };
 
 function encodeNumber(value) {
-  return {
+  return Maybe.Just({
     t: Types.NUMBER,
     v: value
-  };
+  });
 };
 
 function encodeString(value) {
-  return {
+  return Maybe.Just({
     t: Types.STRING,
     v: value
-  };
+  });
 }; 
 
 function encodeArray(array) {
   var encodedItems = [];
 
   for (var i = 0, size = array.length; i < size; i++) {
-    var encodedItem = encode(array[i]);
+    var encodedItemMaybe = encode(array[i]);
 
-    encodedItems.push(encodedItem);
+    if (encodedItemMaybe.isJust) {
+      var encodedItem = encodedItemMaybe.get();
+
+      encodedItems.push(encodedItem);
+    }
   }
 
-  return {
+  return Maybe.Just({
     t: Types.ARRAY,
     v: encodedItems
-  };
+  });
 };
 
 function encodeObject(object) {
@@ -47,20 +53,29 @@ function encodeObject(object) {
 
   for (var key in object) {
     if (object.hasOwnProperty(key)) {
-      var encodedField = encode(object[key]);
+      var encodedValueMaybe = encode(object[key]);
 
-      encodedFields.push({
-        n: key,
-        t: encodedField.t,
-        v: encodedField.v
-      });
+      if (encodedValueMaybe.isJust) {
+        var encodedValue = encodedValueMaybe.get();
+
+        var encodedField = {
+          n: key,
+          t: encodedValue.t
+        };
+
+        if (encodedValue.hasOwnProperty('v')) {
+          encodedField.v = encodedValue.v;
+        }
+
+        encodedFields.push(encodedField);
+      }
     }
   }
 
-  return {
+  return Maybe.Just({
     t: Types.OBJECT,
     v: encodedFields
-  };
+  });
 };
 
 function isNull(value) {
@@ -125,7 +140,7 @@ function encode(value) {
     }
   }
 
-  throw 'Unknown type ' + JSON.stringify({value: value, type: valueType});
+  return Maybe.Nothing();
 };
 
 module.exports = {

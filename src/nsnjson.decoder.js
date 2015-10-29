@@ -1,69 +1,71 @@
+var Maybe = require('data.maybe');
+
 var Types = require('./nsnjson.types.js');
 
-function type(presentation) {
-  return presentation.t;
-}
-
 function decodeNull(presentation) {
-  if (type(presentation) == Types.NULL) {
-    return null;
-  }
+  return Maybe.Just(null);
 }
 
 function decodeBoolean(presentation) {
-  if (type(presentation) == Types.BOOLEAN) {
-    return presentation.v != 0;
+  if (presentation.v == 1) {
+    return Maybe.Just(true);
   }
+
+  if (presentation.v == 0) {
+    return Maybe.Just(false);
+  }
+
+  return Maybe.Nothing();
 };
 
 function decodeNumber(presentation) {
-  if (type(presentation) == Types.NUMBER) {
-    return presentation.v;
-  }
+  return Maybe.Just(presentation.v);
 };
 
 function decodeString(presentation) {
-  if (type(presentation) == Types.STRING) {
-    return presentation.v;
-  }
+  return Maybe.Just(presentation.v);
 };
 
 function decodeArray(presentation) {
-  if (type(presentation) == Types.ARRAY) {
-    var array = [];
+  var array = [];
 
-    var encodedItems = presentation.v;
+  var encodedItems = presentation.v;
 
-    for (var i = 0, size = encodedItems.length; i < size; i++) {
-      var encodedItem = encodedItems[i];
+  for (var i = 0, size = encodedItems.length; i < size; i++) {
+    var encodedItem = encodedItems[i];
 
-      var item = decode(encodedItem);
+    var itemMaybe = decode(encodedItem);
+
+    if (itemMaybe.isJust) {
+      var item = itemMaybe.get();
 
       array.push(item);
     }
-
-    return array;
   }
+
+  return Maybe.Just(array);
 };
 
 function decodeObject(presentation) {
-  if (type(presentation) == Types.OBJECT) {
-    var object = {};
+  var object = {};
 
-    var encodedFields = presentation.v;
+  var encodedFields = presentation.v;
 
-    for (var i = 0, size = encodedFields.length; i < size; i++) {
-      var encodedField = encodedFields[i];
+  for (var i = 0, size = encodedFields.length; i < size; i++) {
+    var encodedField = encodedFields[i];
+
+    var fieldValueMaybe = decode(encodedField);
+
+    if (fieldValueMaybe.isJust) {
+      var value = fieldValueMaybe.get();
 
       var name = encodedField.n;
 
-      var value = decode(encodedField);
-
       object[name] = value;
     }
-
-    return object;
   }
+
+  return Maybe.Just(object);
 };
 
 function checkerByType(type) {
@@ -110,7 +112,7 @@ function decode(presentation) {
     }
   }
 
-  throw 'Unknown type ' + JSON.stringify({presentation: presentation, type: presentation.t});
+  return Maybe.Nothing();
 };
 
 module.exports = {

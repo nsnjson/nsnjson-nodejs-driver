@@ -6,12 +6,20 @@ var Assets = require('./nsnjson.tests.assets');
 
 describe('Driver @ consistency', function() {
   function testConsistency(value) {
-    var toString = JSON.stringify;
+    it(JSON.stringify(value), function() {
+      var encodedValueMaybe = Driver.encode(value);
 
-    it(toString(value), function() {
-      var actualValue = Driver.decode(Driver.encode(value));
+      assert.equal(encodedValueMaybe.isJust, true);
 
-      assert.equal(toString(value), toString(actualValue));
+      var encodedValue = encodedValueMaybe.get();
+
+      var actualValueMaybe = Driver.decode(encodedValue);
+
+      assert.equal(actualValueMaybe.isJust, true);
+
+      var actualValue = actualValueMaybe.get();
+
+      assert.deepEqual(value, actualValue);
     });
   };
 
