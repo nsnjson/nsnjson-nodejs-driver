@@ -74,39 +74,41 @@ function checkerByType(type) {
   };
 };
 
-var resolvers = [
-  {
+var resolvers = {
+  'null': {
     checker: checkerByType(Format.TYPE_MARKER_NULL),
     decoder: decodeNull
   },
-  {
-    checker: checkerByType(Format.TYPE_MARKER_BOOLEAN),
-    decoder: decodeBoolean
-  },
-  {
+  'number': {
     checker: checkerByType(Format.TYPE_MARKER_NUMBER),
     decoder: decodeNumber
   },
-  {
+  'string': {
     checker: checkerByType(Format.TYPE_MARKER_STRING),
     decoder: decodeString
   },
-  {
+  'boolean': {
+    checker: checkerByType(Format.TYPE_MARKER_BOOLEAN),
+    decoder: decodeBoolean
+  },
+  'array': {
     checker: checkerByType(Format.TYPE_MARKER_ARRAY),
     decoder: decodeArray
   },
-  {
+  'object': {
     checker: checkerByType(Format.TYPE_MARKER_OBJECT),
     decoder: decodeObject
   }
-];
+};
 
 function decode(presentation) {
-  for (var i = 0, size = resolvers.length; i < size; i++) {
-    var resolver = resolvers[i];
+  for (var resolverName in resolvers) {
+    if (resolvers.hasOwnProperty(resolverName)) {
+      var resolver = resolvers[resolverName];
 
-    if (resolver.checker(presentation)) {
-      return resolver.decoder(presentation);
+      if (resolver.checker(presentation)) {
+        return resolver.decoder(presentation);
+      }
     }
   }
 
