@@ -76,7 +76,7 @@ function checkerByType(type) {
 
 var resolvers = [
   {
-    checker: checkerByType(Format.NULL),
+    checker: checkerByType(Format.TYPE_MARKER_NULL),
     decoder: decodeNull
   },
   {

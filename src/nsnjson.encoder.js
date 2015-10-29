@@ -4,7 +4,7 @@ var Format = require('./nsnjson.format');
 
 function encodeNull() {
   return Maybe.Just({
-    t: Format.NULL
+    t: Format.TYPE_MARKER_NULL
   });
 };
 
