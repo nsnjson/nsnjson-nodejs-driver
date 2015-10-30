@@ -2,11 +2,11 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
-function decodeNull(presentation) {
+function decodeNull(context) {
   return Maybe.Just(null);
 }
 
-function decodeBoolean(presentation) {
+function decodeBoolean(context, presentation) {
   if (presentation.v == 1) {
     return Maybe.Just(true);
   }
@@ -18,15 +18,15 @@ function decodeBoolean(presentation) {
   return Maybe.Nothing();
 };
 
-function decodeNumber(presentation) {
+function decodeNumber(context, presentation) {
   return Maybe.Just(presentation.v);
 };
 
-function decodeString(presentation) {
+function decodeString(context, presentation) {
   return Maybe.Just(presentation.v);
 };
 
-function decodeArray(presentation) {
+function decodeArray(context, presentation) {
   var array = [];
 
   var encodedItems = presentation.v;
@@ -34,7 +34,7 @@ function decodeArray(presentation) {
   for (var i = 0, size = encodedItems.length; i < size; i++) {
     var encodedItem = encodedItems[i];
 
-    var itemMaybe = decode(encodedItem);
+    var itemMaybe = decode(context, encodedItem);
 
     if (itemMaybe.isJust) {
       var item = itemMaybe.get();
@@ -46,7 +46,7 @@ function decodeArray(presentation) {
   return Maybe.Just(array);
 };
 
-function decodeObject(presentation) {
+function decodeObject(context, presentation) {
   var object = {};
 
   var encodedFields = presentation.v;
@@ -54,7 +54,7 @@ function decodeObject(presentation) {
   for (var i = 0, size = encodedFields.length; i < size; i++) {
     var encodedField = encodedFields[i];
 
-    var fieldValueMaybe = decode(encodedField);
+    var fieldValueMaybe = decode(context, encodedField);
 
     if (fieldValueMaybe.isJust) {
       var value = fieldValueMaybe.get();
@@ -68,47 +68,16 @@ function decodeObject(presentation) {
   return Maybe.Just(object);
 };
 
-function checkerByType(type) {
-  return function(presentation) {
-    return presentation.t == type;
-  };
-};
+function decode(context, presentation) {
+  var resolvers = context.resolvers;
 
-var resolvers = [
-  {
-    checker: checkerByType(Format.TYPE_MARKER_NULL),
-    decoder: decodeNull
-  },
-  {
-    checker: checkerByType(Format.TYPE_MARKER_BOOLEAN),
-    decoder: decodeBoolean
-  },
-  {
-    checker: checkerByType(Format.TYPE_MARKER_NUMBER),
-    decoder: decodeNumber
-  },
-  {
-    checker: checkerByType(Format.TYPE_MARKER_STRING),
-    decoder: decodeString
-  },
-  {
-    checker: checkerByType(Format.TYPE_MARKER_ARRAY),
-    decoder: decodeArray
-  },
-  {
-    checker: checkerByType(Format.TYPE_MARKER_OBJECT),
-    decoder: decodeObject
-  }
-];
+  for (var resolverName in resolvers) {
+    if (resolvers.hasOwnProperty(resolverName)) {
+      var resolver = resolvers[resolverName];
 
-var resolversCount = resolvers.length;
-
-function decode(presentation) {
-  for (var i = 0; i < resolversCount; i++) {
-    var resolver = resolvers[i];
-
-    if (resolver.checker(presentation)) {
-      return resolver.decoder(presentation);
+      if (resolver.checker(presentation)) {
+        return resolver.decoder(context, presentation);
+      }
     }
   }
 
@@ -116,5 +85,75 @@ function decode(presentation) {
 };
 
 module.exports = {
-  decode: decode
+  decode: function(presentation, customResolvers) {
+    function checkerByType(type) {
+      return function(presentation) {
+        return presentation.t == type;
+      };
+    }
+
+    var context = {
+      resolvers: {
+        'null': {
+          checker: checkerByType(Format.TYPE_MARKER_NULL),
+          decoder: decodeNull
+        },
+        'number': {
+          checker: checkerByType(Format.TYPE_MARKER_NUMBER),
+          decoder: decodeNumber
+        },
+        'string': {
+          checker: checkerByType(Format.TYPE_MARKER_STRING),
+          decoder: decodeString
+        },
+        'boolean': {
+          checker: checkerByType(Format.TYPE_MARKER_BOOLEAN),
+          decoder: decodeBoolean
+        },
+        'array': {
+          checker: checkerByType(Format.TYPE_MARKER_ARRAY),
+          decoder: decodeArray
+        },
+        'object': {
+          checker: checkerByType(Format.TYPE_MARKER_OBJECT),
+          decoder: decodeObject
+        }
+      }
+    };
+
+    if (customResolvers && (customResolvers instanceof Object)) {
+      function installCustomResolver(resolverName) {
+        if (context.resolvers.hasOwnProperty(resolverName) && customResolvers.hasOwnProperty(resolverName)) {
+          var customResolver = customResolvers[resolverName];
+
+          if (customResolver instanceof Object) {
+            if (customResolver.hasOwnProperty('checker')) {
+              var customResolverChecker = customResolver.checker;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].checker = customResolver.checker;
+              }
+            }
+
+            if (customResolver.hasOwnProperty('decoder')) {
+              var customResolverChecker = customResolver.decoder;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].decoder = customResolver.decoder;
+              }
+            }
+          }
+        }
+      }
+
+      installCustomResolver('null');
+      installCustomResolver('number');
+      installCustomResolver('string');
+      installCustomResolver('boolean');
+      installCustomResolver('array');
+      installCustomResolver('object');
+    }
+
+    return decode(context, presentation);
+  }
 };

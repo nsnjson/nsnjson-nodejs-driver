@@ -2,38 +2,38 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
-function encodeNull() {
+function encodeNull(context) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_NULL
   });
 };
 
-function encodeBoolean(value) {
+function encodeBoolean(context, value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_BOOLEAN,
     v: ~~value
   });
 };
 
-function encodeNumber(value) {
+function encodeNumber(context, value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_NUMBER,
     v: value
   });
 };
 
-function encodeString(value) {
+function encodeString(context, value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_STRING,
     v: value
   });
 }; 
 
-function encodeArray(array) {
+function encodeArray(context, array) {
   var encodedItems = [];
 
   for (var i = 0, size = array.length; i < size; i++) {
-    var encodedItemMaybe = encode(array[i]);
+    var encodedItemMaybe = encode(context, array[i]);
 
     if (encodedItemMaybe.isJust) {
       var encodedItem = encodedItemMaybe.get();
@@ -48,12 +48,12 @@ function encodeArray(array) {
   });
 };
 
-function encodeObject(object) {
+function encodeObject(context, object) {
   var encodedFields = [];
 
   for (var key in object) {
     if (object.hasOwnProperty(key)) {
-      var encodedValueMaybe = encode(object[key]);
+      var encodedValueMaybe = encode(context, object[key]);
 
       if (encodedValueMaybe.isJust) {
         var encodedValue = encodedValueMaybe.get();
@@ -102,41 +102,16 @@ function isObject(value) {
   return (value instanceof Object);
 };
 
-var resolvers = [
-  {
-    checker: isNull,
-    encoder: encodeNull
-  },
-  {
-    checker: isBoolean,
-    encoder: encodeBoolean
-  },
-  {
-    checker: isNumber,
-    encoder: encodeNumber
-  },
-  {
-    checker: isString,
-    encoder: encodeString
-  },
-  {
-    checker: isArray,
-    encoder: encodeArray
-  },
-  {
-    checker: isObject,
-    encoder: encodeObject
-  }
-];
+function encode(context, value) {
+  var resolvers = context.resolvers;
 
-var resolversCount = resolvers.length;
+  for (var resolverName in resolvers) {
+    if (resolvers.hasOwnProperty(resolverName)) {
+      var resolver = resolvers[resolverName];
 
-function encode(value) {
-  for (var i = 0; i < resolversCount; i++) {
-    var resolver = resolvers[i];
-
-    if (resolver.checker(value)) {
-      return resolver.encoder(value);
+      if (resolver.checker(value)) {
+        return resolver.encoder(context, value);
+      }
     }
   }
 
@@ -144,5 +119,69 @@ function encode(value) {
 };
 
 module.exports = {
-  encode: encode
+  encode: function(value, customResolvers) {
+    var context = {
+      resolvers: {
+        'null': {
+          checker: isNull,
+          encoder: encodeNull
+        },
+        'number': {
+          checker: isNumber,
+          encoder: encodeNumber
+        },
+        'string': {
+          checker: isString,
+          encoder: encodeString
+        },
+        'boolean': {
+          checker: isBoolean,
+          encoder: encodeBoolean
+        },
+        'array': {
+          checker: isArray,
+          encoder: encodeArray
+        },
+        'object': {
+          checker: isObject,
+          encoder: encodeObject
+        }
+      }
+    };
+
+    if (customResolvers && (customResolvers instanceof Object)) {
+      function installCustomResolver(resolverName) {
+        if (context.resolvers.hasOwnProperty(resolverName) && customResolvers.hasOwnProperty(resolverName)) {
+          var customResolver = customResolvers[resolverName];
+
+          if (customResolver instanceof Object) {
+            if (customResolver.hasOwnProperty('checker')) {
+              var customResolverChecker = customResolver.checker;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].checker = customResolver.checker;
+              }
+            }
+
+            if (customResolver.hasOwnProperty('encoder')) {
+              var customResolverChecker = customResolver.encoder;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].encoder = customResolver.encoder;
+              }
+            }
+          }
+        }
+      }
+
+      installCustomResolver('null');
+      installCustomResolver('number');
+      installCustomResolver('string');
+      installCustomResolver('boolean');
+      installCustomResolver('array');
+      installCustomResolver('object');
+    }
+
+    return encode(context, value);
+  }
 };
