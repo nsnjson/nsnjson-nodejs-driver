@@ -119,7 +119,7 @@ function encode(context, value) {
 };
 
 module.exports = {
-  encode: function(value) {
+  encode: function(value, customResolvers) {
     var context = {
       resolvers: {
         'null': {
@@ -148,6 +148,39 @@ module.exports = {
         }
       }
     };
+
+    if (customResolvers && (customResolvers instanceof Object)) {
+      function installCustomResolver(resolverName) {
+        if (context.resolvers.hasOwnProperty(resolverName) && customResolvers.hasOwnProperty(resolverName)) {
+          var customResolver = customResolvers[resolverName];
+
+          if (customResolver instanceof Object) {
+            if (customResolver.hasOwnProperty('checker')) {
+              var customResolverChecker = customResolver.checker;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].checker = customResolver.checker;
+              }
+            }
+
+            if (customResolver.hasOwnProperty('encoder')) {
+              var customResolverChecker = customResolver.encoder;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].encoder = customResolver.encoder;
+              }
+            }
+          }
+        }
+      }
+
+      installCustomResolver('null');
+      installCustomResolver('number');
+      installCustomResolver('string');
+      installCustomResolver('boolean');
+      installCustomResolver('array');
+      installCustomResolver('object');
+    }
 
     return encode(context, value);
   }
