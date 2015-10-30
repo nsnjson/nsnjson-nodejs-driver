@@ -85,7 +85,7 @@ function decode(context, presentation) {
 };
 
 module.exports = {
-  decode: function(presentation) {
+  decode: function(presentation, customResolvers) {
     function checkerByType(type) {
       return function(presentation) {
         return presentation.t == type;
@@ -120,6 +120,39 @@ module.exports = {
         }
       }
     };
+
+    if (customResolvers && (customResolvers instanceof Object)) {
+      function installCustomResolver(resolverName) {
+        if (context.resolvers.hasOwnProperty(resolverName) && customResolvers.hasOwnProperty(resolverName)) {
+          var customResolver = customResolvers[resolverName];
+
+          if (customResolver instanceof Object) {
+            if (customResolver.hasOwnProperty('checker')) {
+              var customResolverChecker = customResolver.checker;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].checker = customResolver.checker;
+              }
+            }
+
+            if (customResolver.hasOwnProperty('decoder')) {
+              var customResolverChecker = customResolver.decoder;
+
+              if (customResolverChecker instanceof Function) {
+                context.resolvers[resolverName].decoder = customResolver.decoder;
+              }
+            }
+          }
+        }
+      }
+
+      installCustomResolver('null');
+      installCustomResolver('number');
+      installCustomResolver('string');
+      installCustomResolver('boolean');
+      installCustomResolver('array');
+      installCustomResolver('object');
+    }
 
     return decode(context, presentation);
   }
