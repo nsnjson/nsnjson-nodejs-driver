@@ -2,38 +2,38 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
-function encodeNull() {
+function encodeNull(context) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_NULL
   });
 };
 
-function encodeBoolean(value) {
+function encodeBoolean(context, value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_BOOLEAN,
     v: ~~value
   });
 };
 
-function encodeNumber(value) {
+function encodeNumber(context, value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_NUMBER,
     v: value
   });
 };
 
-function encodeString(value) {
+function encodeString(context, value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_STRING,
     v: value
   });
 }; 
 
-function encodeArray(array) {
+function encodeArray(context, array) {
   var encodedItems = [];
 
   for (var i = 0, size = array.length; i < size; i++) {
-    var encodedItemMaybe = encode(array[i]);
+    var encodedItemMaybe = encode(context, array[i]);
 
     if (encodedItemMaybe.isJust) {
       var encodedItem = encodedItemMaybe.get();
@@ -48,12 +48,12 @@ function encodeArray(array) {
   });
 };
 
-function encodeObject(object) {
+function encodeObject(context, object) {
   var encodedFields = [];
 
   for (var key in object) {
     if (object.hasOwnProperty(key)) {
-      var encodedValueMaybe = encode(object[key]);
+      var encodedValueMaybe = encode(context, object[key]);
 
       if (encodedValueMaybe.isJust) {
         var encodedValue = encodedValueMaybe.get();
@@ -102,40 +102,15 @@ function isObject(value) {
   return (value instanceof Object);
 };
 
-var resolvers = {
-  'null': {
-    checker: isNull,
-    encoder: encodeNull
-  },
-  'number': {
-    checker: isNumber,
-    encoder: encodeNumber
-  },
-  'string': {
-    checker: isString,
-    encoder: encodeString
-  },
-  'boolean': {
-    checker: isBoolean,
-    encoder: encodeBoolean
-  },
-  'array': {
-    checker: isArray,
-    encoder: encodeArray
-  },
-  'object': {
-    checker: isObject,
-    encoder: encodeObject
-  }
-};
+function encode(context, value) {
+  var resolvers = context.resolvers;
 
-function encode(value) {
   for (var resolverName in resolvers) {
     if (resolvers.hasOwnProperty(resolverName)) {
       var resolver = resolvers[resolverName];
 
       if (resolver.checker(value)) {
-        return resolver.encoder(value);
+        return resolver.encoder(context, value);
       }
     }
   }
@@ -145,6 +120,35 @@ function encode(value) {
 
 module.exports = {
   encode: function(value) {
-    return encode(value);
+    var context = {
+      resolvers: {
+        'null': {
+          checker: isNull,
+          encoder: encodeNull
+        },
+        'number': {
+          checker: isNumber,
+          encoder: encodeNumber
+        },
+        'string': {
+          checker: isString,
+          encoder: encodeString
+        },
+        'boolean': {
+          checker: isBoolean,
+          encoder: encodeBoolean
+        },
+        'array': {
+          checker: isArray,
+          encoder: encodeArray
+        },
+        'object': {
+          checker: isObject,
+          encoder: encodeObject
+        }
+      }
+    };
+
+    return encode(context, value);
   }
 };
