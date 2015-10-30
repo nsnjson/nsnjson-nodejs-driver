@@ -53,6 +53,39 @@ var encodedJSON = nsnjson.encode(json);
 console.log(encodedJSON);
 // Maybe { value: { "t": "null" } }
 
-console.log(nsnjson.decode(encodedJSON));
-// Maybe { null }
+console.log(nsnjson.decode(encodedJSON.get()));
+// Maybe { value: null }
+```
+
+## Custom rules
+
+Start from 0.0.3, you can define your own rules for JSON encoding/decoding.
+Just pass custom rules as an argument to related functions:
+- *nsnjson.encoder @ encode(value, customResolvers)*
+- *nsnjson.encoder @ decode(presentation, customResolvers)*
+
+Example:
+```javascript
+var Maybe = require('data.maybe');
+
+var nsnjson = require('nsnjson-driver');
+
+var json = 1007;
+
+var encodedJSON = nsnjson.encode(json, {
+  'number': {
+    encoder: function(context, value) { return Maybe.Just(['number', value]); }
+  }
+});
+
+console.log(encodedJSON);
+// Maybe { value: [ "number", 1007 ] }
+
+console.log(nsnjson.decode(encodedJSON.get(), {
+  'number': {
+    checker: function(presentation) { return presentation[0] == 'number'; },
+    decoder: function(context, presentation) { return Maybe.Just(presentation[1]); }
+  }
+}));
+// Maybe { value: 1007 }
 ```

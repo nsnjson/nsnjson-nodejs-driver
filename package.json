@@ -1,6 +1,6 @@
 {
   "name": "nsnjson-driver",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "NSNJSON (Not So Normal JSON) Driver",
   "author": "Maks Atygaev <jxcoder@ya.ru>",
   "repository": {
