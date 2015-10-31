@@ -1,4 +1,4 @@
-# NSNJSON Node.js Driver
+# NSNJSON Node.js Driver ![build](https://circleci.com/gh/nsnjson/nsnjson-nodejs-driver/tree/develop.svg?style=shield&circle-token=1859fd68de67bc039fc6a6d1cf912cd6f052eab4)
 ## NSNJSON - Not So Normal JSON
 
 ![nsnjson_logo](https://raw.githubusercontent.com/wiki/nsnjson/nsnjson-driver/images/nsnjson_logo.png)
