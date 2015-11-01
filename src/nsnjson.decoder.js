@@ -2,22 +2,18 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
+var Types = require('./nsnjson.types');
+
 function Decoding() {}
 
 Decoding.prototype.getType = function(presentation) {
   switch (presentation.t) {
-    case Format.TYPE_MARKER_NULL:
-      return Maybe.Just('null');
-    case Format.TYPE_MARKER_NUMBER:
-      return Maybe.Just('number');
-    case Format.TYPE_MARKER_STRING:
-      return Maybe.Just('string');
-    case Format.TYPE_MARKER_BOOLEAN:
-      return Maybe.Just('boolean');
-    case Format.TYPE_MARKER_ARRAY:
-      return Maybe.Just('array');
-    case Format.TYPE_MARKER_OBJECT:
-      return Maybe.Just('object');
+    case Format.TYPE_MARKER_NULL:    return Maybe.Just(Types.NULL);
+    case Format.TYPE_MARKER_NUMBER:  return Maybe.Just(Types.NUMBER);
+    case Format.TYPE_MARKER_STRING:  return Maybe.Just(Types.STRING);
+    case Format.TYPE_MARKER_BOOLEAN: return Maybe.Just(Types.BOOLEAN);
+    case Format.TYPE_MARKER_ARRAY:   return Maybe.Just(Types.ARRAY);
+    case Format.TYPE_MARKER_OBJECT:  return Maybe.Just(Types.OBJECT);
   }
 
   return Maybe.Nothing();
@@ -96,18 +92,12 @@ Decoding.prototype.decode = function(presentation) {
     var type = typeOption.get();
 
     switch (type) {
-      case 'null':
-        return this.decodeNull();
-      case 'number':
-        return this.decodeNumber(presentation);
-      case 'string':
-        return this.decodeString(presentation);
-      case 'boolean':
-        return this.decodeBoolean(presentation);
-      case 'array':
-        return this.decodeArray(presentation);
-      case 'object':
-        return this.decodeObject(presentation);
+      case Types.NULL:    return this.decodeNull();
+      case Types.NUMBER:  return this.decodeNumber(presentation);
+      case Types.STRING:  return this.decodeString(presentation);
+      case Types.BOOLEAN: return this.decodeBoolean(presentation);
+      case Types.ARRAY:   return this.decodeArray(presentation);
+      case Types.OBJECT:  return this.decodeObject(presentation);
     }
   }
 
@@ -116,7 +106,7 @@ Decoding.prototype.decode = function(presentation) {
 
 module.exports = {
   decode: function(presentation, options) {
-    var decodersNames = ['null', 'number', 'string','boolean', 'array', 'object'];
+    var decodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
     var decoding = new Decoding();
 
@@ -133,24 +123,12 @@ module.exports = {
 
           if (customDecoder instanceof Function) {
             switch (decoderName) {
-              case 'null':
-                decoding.decodeNull = customDecoder;
-                break;
-              case 'number':
-                decoding.decodeNumber = customDecoder;
-                break
-              case 'string':
-                decoding.decodeString = customDecoder;
-                break;
-              case 'boolean':
-                decoding.decodeBoolean = customDecoder;
-                break;
-              case 'array':
-                decoding.decodeArray = customDecoder;
-                break;
-              case 'object':
-                decoding.decodeObject = customDecoder;
-                break;
+              case Types.NULL:    decoding.decodeNull = customDecoder; break;
+              case Types.NUMBER:  decoding.decodeNumber = customDecoder; break;
+              case Types.STRING:  decoding.decodeString = customDecoder; break;
+              case Types.BOOLEAN: decoding.decodeBoolean = customDecoder; break;
+              case Types.ARRAY:   decoding.decodeArray = customDecoder; break;
+              case Types.OBJECT:  decoding.decodeObject = customDecoder; break;
             }
           }
         }
