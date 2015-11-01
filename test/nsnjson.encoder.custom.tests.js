@@ -64,9 +64,9 @@ describe('Encoder @ encode (custom)', function() {
     return Maybe.Just([Types.OBJECT, fieldsPresentation]);
   }
 
-  function testEncoding(name, json, presentation) {
+  function testEncoding(name, data, presentation) {
     it(name, function() {
-      var actualPresentationMaybe = Encoder.encode(json, encoderOptions);
+      var actualPresentationMaybe = Encoder.encode(data, encoderOptions);
 
       Assert.equal(actualPresentationMaybe.isJust, true);
 
