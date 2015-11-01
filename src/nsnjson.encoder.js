@@ -137,7 +137,14 @@ Encoding.prototype.encode = function(data) {
   return Maybe.Nothing();
 }
 
+/**
+ * @module Encoder
+ */
 module.exports = {
+  /**
+   * @param {JSON} data JSON
+   * @param {Object} options Encoder options
+   */
   encode: function(data, options) {
     var encodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
