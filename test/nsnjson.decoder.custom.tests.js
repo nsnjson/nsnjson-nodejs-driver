@@ -80,15 +80,13 @@ describe('Decoder @ decode (custom)', function() {
     return Maybe.Just(object);
   }
 
-  function testDecoding(name, json, presentation) {
+  function testDecoding(name, data, presentation) {
     it(name, function() {
-      var actualValueMaybe = Decoder.decode(presentation, decoderOptions);
+      var actualDataMaybe = Decoder.decode(presentation, decoderOptions);
 
-      Assert.equal(actualValueMaybe.isJust, true);
+      Assert.equal(actualDataMaybe.isJust, true);
 
-      var actualJSON = actualValueMaybe.get();
-
-      Assert.deepEqual(json, actualJSON);
+      Assert.deepEqual(data, actualDataMaybe.get());
     });
   }
 
