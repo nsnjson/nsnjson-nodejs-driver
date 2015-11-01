@@ -1,34 +1,10 @@
 {
-  "data": [
-    null,
-    true,
-    false,
-    213,
-    "Hello world!"
-  ],
+  "name": "boolean / true",
+
+  "data": true,
 
   "presentation": {
-    "t": 4,
-    "v": [
-      {
-        "t": 0
-      },
-      {
-        "t": 3,
-        "v": 1
-      },
-      {
-        "t": 3,
-        "v": 0
-      },
-      {
-        "t": 1,
-        "v": 213
-      },
-      {
-        "t": 2,
-        "v": "Hello world!"
-      }
-    ]
+    "t": 3,
+    "v": 1
   }
 }

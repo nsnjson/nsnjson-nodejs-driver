@@ -1,8 +1,10 @@
 {
-  "data": false,
+  "name": "number / double",
+
+  "data": 10.26,
 
   "presentation": {
-    "t": 3,
-    "v": 0
+    "t": 1,
+    "v": 10.26
   }
 }
