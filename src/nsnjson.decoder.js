@@ -104,7 +104,14 @@ Decoding.prototype.decode = function(presentation) {
   return Maybe.Nothing();
 }
 
+/**
+ * @module Decoder
+ */
 module.exports = {
+  /**
+   * @param {JSON} presentation NSNJSON presentation of JSON
+   * @param {Object} options Decoder options
+   */
   decode: function(presentation, options) {
     var decodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
