@@ -79,10 +79,17 @@ var presentationMaybe = nsnjson.encode(data, {
 });
 
 console.log(presentationMaybe);
+
 // Maybe { value: [ "number", 1007 ] }
 
 console.log(nsnjson.decode(presentationMaybe.get(), {
-  'number': function(presentation) { return Maybe.Just(presentation[1]); }
+  'type': function(presentation) {
+    return Maybe.Just(presentation[0]);
+  },
+  'number': function(presentation) {
+    return Maybe.Just(presentation[1]);
+  }
 }));
+
 // Maybe { value: 1007 }
 ```
