@@ -2,132 +2,149 @@ var Assert = require('assert');
 
 var Decoder = require('../src/nsnjson.decoder');
 
+var Types = require('../src/nsnjson.types');
+
 var Maybe = require('data.maybe');
 
 describe('Decoder @ decode (custom)', function() {
 
-  function typeDetector(presentation, typeName) {
-    return presentation[0] == typeName;
-  }
-
-  var customResolvers = {
+  var decoderOptions = {
     'type': function(presentation) {
       return Maybe.Just(presentation[0]);
-    },
-    'null': function(presentation) {
-      return Maybe.Just(null);
-    },
-    'number': function(presentation) {
-      return Maybe.Just(presentation[1]);
-    },
-    'string': function(presentation) {
-      return Maybe.Just(presentation[1]);
-    },
-    'boolean': function(presentation) {
-      if (presentation[1] == 1) {
-        return Maybe.Just(true);
-      }
-
-      if (presentation[1] == 0) {
-        return Maybe.Just(false);
-      }
-
-      return Maybe.Nothing();
-    },
-    'array': function(presentation) {
-      var array = [];
-
-      var itemsPresentation = presentation[1];
-
-      for (var i = 0, size = itemsPresentation.length; i < size; i++) {
-        var itemPresentation = itemsPresentation[i];
-
-        var itemMaybe = this.decode(itemPresentation);
-
-        if (itemMaybe.isJust) {
-          var item = itemMaybe.get();
-
-          array.push(item);
-        }
-      }
-
-      return Maybe.Just(array);
-    },
-    'object': function(presentation) {
-      var object = {};
-
-      var fieldsPresentation = presentation[1];
-
-      for (var i = 0, size = fieldsPresentation.length; i < size; i++) {
-        var fieldPresentation = fieldsPresentation[i];
-
-        var name = fieldPresentation[fieldPresentation.length - 1];
-
-        var valueMaybe = this.decode(fieldPresentation);
-
-        if (valueMaybe.isJust) {
-          var value = valueMaybe.get();
-
-          object[name] = value;
-        }
-      }
-
-      return Maybe.Just(object);
     }
   };
 
-  function testDecoding(value, presentation) {
-    it(JSON.stringify(value), function() {
-      var actualValueMaybe = Decoder.decode(presentation, customResolvers);
+  decoderOptions[Types.NULL] = function(presentation) {
+    return Maybe.Just(null);
+  }
+
+  decoderOptions[Types.NUMBER] = function(presentation) {
+    return Maybe.Just(presentation[1]);
+  }
+
+  decoderOptions[Types.STRING] = function(presentation) {
+    return Maybe.Just(presentation[1]);
+  }
+
+  decoderOptions[Types.BOOLEAN] = function(presentation) {
+    if (presentation[1] == 1) {
+      return Maybe.Just(true);
+    }
+
+    if (presentation[1] == 0) {
+      return Maybe.Just(false);
+    }
+
+    return Maybe.Nothing();
+  }
+
+  decoderOptions[Types.ARRAY] = function(presentation) {
+    var array = [];
+
+    var itemsPresentation = presentation[1];
+
+    for (var i = 0, size = itemsPresentation.length; i < size; i++) {
+      var itemPresentation = itemsPresentation[i];
+
+      var itemMaybe = this.decode(itemPresentation);
+
+      if (itemMaybe.isJust) {
+        var item = itemMaybe.get();
+
+        array.push(item);
+      }
+    }
+
+    return Maybe.Just(array);
+  }
+
+  decoderOptions[Types.OBJECT] = function(presentation) {
+    var object = {};
+
+    var fieldsPresentation = presentation[1];
+
+    for (var i = 0, size = fieldsPresentation.length; i < size; i++) {
+      var fieldPresentation = fieldsPresentation[i];
+
+      var name = fieldPresentation[fieldPresentation.length - 1];
+
+      var valueMaybe = this.decode(fieldPresentation);
+
+      if (valueMaybe.isJust) {
+        var value = valueMaybe.get();
+
+        object[name] = value;
+      }
+    }
+
+    return Maybe.Just(object);
+  }
+
+  function testDecoding(name, json, presentation) {
+    it(name, function() {
+      var actualValueMaybe = Decoder.decode(presentation, decoderOptions);
 
       Assert.equal(actualValueMaybe.isJust, true);
 
-      var actualValue = actualValueMaybe.get();
+      var actualJSON = actualValueMaybe.get();
 
-      Assert.deepEqual(value, actualValue);
+      Assert.deepEqual(json, actualJSON);
     });
   }
 
-  testDecoding(
+  testDecoding('null',
     null,
 
     ['null']
   );
 
-  testDecoding(
-    1007,
+  testDecoding('number / int',
+    2015,
 
-    ['number', 1007]
+    ['number', 2015]
   );
 
-  testDecoding(
+  testDecoding('number / double',
+    10.26,
+
+    ['number', 10.26]
+  );
+
+  testDecoding('string / empty',
+    '',
+
+    ['string', '']
+  );
+
+  testDecoding('string',
     'nsnjson',
 
     ['string', 'nsnjson']
   );
 
-  testDecoding(
+  testDecoding('boolean / true',
     true,
 
     ['boolean', 1]
   );
 
-  testDecoding(
+  testDecoding('boolean / false',
     false,
 
     ['boolean', 0]
   );
 
-  testDecoding(
+  testDecoding('array / empty',
     [],
 
     ['array', []]
   );
 
-  testDecoding(
+  testDecoding('array',
     [
       null,
-      1007,
+      2015,
+      10.26,
       'nsnjson',
       true,
       false
@@ -135,23 +152,25 @@ describe('Decoder @ decode (custom)', function() {
 
     ['array', [
       ['null'],
-      ['number', 1007],
+      ['number', 2015],
+      ['number', 10.26],
       ['string', 'nsnjson'],
       ['boolean', 1],
       ['boolean', 0]
     ]]
   );
 
-  testDecoding(
+  testDecoding('object / empty',
     {},
 
     ['object', []]
   );
 
-  testDecoding(
+  testDecoding('object',
     {
       null_field: null,
-      number_field: 1007,
+      int_field: 2015,
+      double_field: 10.26,
       string_field: 'nsnjson',
       true_field: true,
       false_field: false
@@ -159,7 +178,8 @@ describe('Decoder @ decode (custom)', function() {
 
     ['object', [
       ['null', 'null_field'],
-      ['number', 1007, 'number_field'],
+      ['number', 2015, 'int_field'],
+      ['number', 10.26, 'double_field'],
       ['string', 'nsnjson', 'string_field'],
       ['boolean', 1, 'true_field'],
       ['boolean', 0, 'false_field']
