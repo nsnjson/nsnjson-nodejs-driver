@@ -2,6 +2,8 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
+var Types = require('./nsnjson.types');
+
 function Encoding() {}
 
 Encoding.isNull = function(json) {
@@ -137,7 +139,7 @@ Encoding.prototype.encode = function(json) {
 
 module.exports = {
   encode: function(json, options) {
-    var encodersNames = ['null', 'number', 'string', 'boolean', 'array', 'object'];
+    var encodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
     var encoding = new Encoding();
 
@@ -150,22 +152,22 @@ module.exports = {
 
           if (customEncoder instanceof Function) {
             switch (encoderName) {
-              case 'null':
+              case Types.NULL:
                 encoding.encodeNull = customEncoder;
                 break;
-              case 'number':
+              case Types.NUMBER:
                 encoding.encodeNumber = customEncoder;
                 break
-              case 'string':
+              case Types.STRING:
                 encoding.encodeString = customEncoder;
                 break;
-              case 'boolean':
+              case Types.BOOLEAN:
                 encoding.encodeBoolean = customEncoder;
                 break;
-              case 'array':
+              case Types.ARRAY:
                 encoding.encodeArray = customEncoder;
                 break;
-              case 'object':
+              case Types.OBJECT:
                 encoding.encodeObject = customEncoder;
                 break;
             }
