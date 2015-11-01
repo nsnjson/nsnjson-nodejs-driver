@@ -11,77 +11,68 @@ describe('Decoder @ decode (custom)', function() {
   }
 
   var customResolvers = {
-    'null': {
-      checker: function(presentation) { return typeDetector(presentation, 'null'); },
-      decoder: function(context, presentation) { return Maybe.Just(null); }
+    'type': function(presentation) {
+      return Maybe.Just(presentation[0]);
     },
-    'number': {
-      checker: function(presentation) { return typeDetector(presentation, 'number'); },
-      decoder: function(context, presentation) { return Maybe.Just(presentation[1]); }
+    'null': function(presentation) {
+      return Maybe.Just(null);
     },
-    'string': {
-      checker: function(presentation) { return typeDetector(presentation, 'string'); },
-      decoder: function(context, presentation) { return Maybe.Just(presentation[1]); }
+    'number': function(presentation) {
+      return Maybe.Just(presentation[1]);
     },
-    'boolean': {
-      checker: function(presentation) { return typeDetector(presentation, 'boolean'); },
-      decoder: function(context, presentation) {
-        if (presentation[1] == 1) {
-          return Maybe.Just(true);
-        }
-
-        if (presentation[1] == 0) {
-          return Maybe.Just(false);
-        }
-
-        return Maybe.Nothing();
+    'string': function(presentation) {
+      return Maybe.Just(presentation[1]);
+    },
+    'boolean': function(presentation) {
+      if (presentation[1] == 1) {
+        return Maybe.Just(true);
       }
-    },
-    'array': {
-      checker: function(presentation) { return typeDetector(presentation, 'array'); },
-      decoder: function(context, presentation) {
-        var array = [];
 
-        var encodedItems = presentation[1];
-
-        for (var i = 0, size = encodedItems.length; i < size; i++) {
-          var encodedItem = encodedItems[i];
-
-          var itemMaybe = Decoder.decode(encodedItem, customResolvers);
-
-          if (itemMaybe.isJust) {
-            var item = itemMaybe.get();
-
-            array.push(item);
-          }
-        }
-
-        return Maybe.Just(array);
+      if (presentation[1] == 0) {
+        return Maybe.Just(false);
       }
+
+      return Maybe.Nothing();
     },
-    'object': {
-      checker: function(presentation) { return typeDetector(presentation, 'object'); },
-      decoder: function(context, presentation) {
-        var object = {};
+    'array': function(presentation) {
+      var array = [];
 
-        var encodedFields = presentation[1];
+      var itemsPresentation = presentation[1];
 
-        for (var i = 0, size = encodedFields.length; i < size; i++) {
-          var encodedField = encodedFields[i];
+      for (var i = 0, size = itemsPresentation.length; i < size; i++) {
+        var itemPresentation = itemsPresentation[i];
 
-          var fieldValueMaybe = Decoder.decode(encodedField, customResolvers);
+        var itemMaybe = this.decode(itemPresentation);
 
-          if (fieldValueMaybe.isJust) {
-            var value = fieldValueMaybe.get();
+        if (itemMaybe.isJust) {
+          var item = itemMaybe.get();
 
-            var name = encodedField[encodedField.length - 1];
-
-            object[name] = value;
-          }
+          array.push(item);
         }
-
-        return Maybe.Just(object);
       }
+
+      return Maybe.Just(array);
+    },
+    'object': function(presentation) {
+      var object = {};
+
+      var fieldsPresentation = presentation[1];
+
+      for (var i = 0, size = fieldsPresentation.length; i < size; i++) {
+        var fieldPresentation = fieldsPresentation[i];
+
+        var name = fieldPresentation[fieldPresentation.length - 1];
+
+        var valueMaybe = this.decode(fieldPresentation);
+
+        if (valueMaybe.isJust) {
+          var value = valueMaybe.get();
+
+          object[name] = value;
+        }
+      }
+
+      return Maybe.Just(object);
     }
   };
 
