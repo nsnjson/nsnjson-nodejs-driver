@@ -1,0 +1,8 @@
+{
+  "NULL":    "null",
+  "NUMBER":  "number",
+  "STRING":  "string",
+  "BOOLEAN": "boolean",
+  "ARRAY":   "array",
+  "OBJECT":  "object"
+}

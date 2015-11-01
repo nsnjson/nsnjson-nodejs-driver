@@ -70,22 +70,26 @@ var Maybe = require('data.maybe');
 
 var nsnjson = require('nsnjson-driver');
 
-var json = 1007;
+var data = 1007;
 
-var encodedJSON = nsnjson.encode(json, {
-  'number': {
-    encoder: function(context, value) { return Maybe.Just(['number', value]); }
+var presentationMaybe = nsnjson.encode(data, {
+  'number': function(value) {
+    return Maybe.Just(['number', value]);
   }
 });
 
-console.log(encodedJSON);
+console.log(presentationMaybe);
+
 // Maybe { value: [ "number", 1007 ] }
 
-console.log(nsnjson.decode(encodedJSON.get(), {
-  'number': {
-    checker: function(presentation) { return presentation[0] == 'number'; },
-    decoder: function(context, presentation) { return Maybe.Just(presentation[1]); }
+console.log(nsnjson.decode(presentationMaybe.get(), {
+  'type': function(presentation) {
+    return Maybe.Just(presentation[0]);
+  },
+  'number': function(presentation) {
+    return Maybe.Just(presentation[1]);
   }
 }));
+
 // Maybe { value: 1007 }
 ```

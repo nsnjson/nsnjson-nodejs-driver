@@ -3,8 +3,5 @@
 
   "data": 10.26,
 
-  "presentation": {
-    "t": 1,
-    "v": 10.26
-  }
+  "presentation": ["number", 10.26]
 }

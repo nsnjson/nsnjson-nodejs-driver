@@ -1,0 +1,24 @@
+{
+  "name": "array / empty",
+
+  "data": [
+    null,
+    2015,
+    10.26,
+    "nsnjson",
+    true,
+    false
+  ],
+
+  "presentation": [
+    "array", [
+      ["null"],
+      ["number", 2015],
+      ["number", 10.26],
+      ["string", "nsnjson"],
+      ["boolean", 1],
+      ["boolean", 0]
+    ]
+  ]
+
+}

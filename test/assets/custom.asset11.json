@@ -1,0 +1,22 @@
+{
+  "name": "object",
+
+  "data": {
+    "null_field": null,
+    "int_field": 2015,
+    "double_field": 10.26,
+    "string_field": "nsnjson",
+    "true_field": true,
+    "false_field": false
+  },
+
+  "presentation": [
+    "object", [
+      ["null", "null_field"],
+      ["number", 2015, "int_field"],
+      ["number", 10.26, "double_field"],
+      ["string", "nsnjson", "string_field"],
+      ["boolean", 1, "true_field"],
+      ["boolean", 0, "false_field"]
+  ]]
+}

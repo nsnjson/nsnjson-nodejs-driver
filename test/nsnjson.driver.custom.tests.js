@@ -1,21 +1,21 @@
 var assert = require("assert");
 
-var Driver = require('../src/nsnjson.driver');
+var CustomDriver = require('./nsnjson.driver.custom');
 
 var Assets = require('./nsnjson.tests.assets');
 
-describe('Driver @ consistency', function() {
+describe('Driver @ consistency (custom)', function() {
 
   function assertConsistency(name, data, presentation) {
 
     function assertConsistencyByEncoding() {
-      var actualPresentationMaybe = Driver.encode(data);
+      var actualPresentationMaybe = CustomDriver.encode(data);
 
       assert.equal(actualPresentationMaybe.isJust, true);
 
       var actualPresentation = actualPresentationMaybe.get();
 
-      var actualDataMaybe = Driver.decode(actualPresentation);
+      var actualDataMaybe = CustomDriver.decode(actualPresentation);
 
       assert.equal(actualDataMaybe.isJust, true);
 
@@ -25,13 +25,13 @@ describe('Driver @ consistency', function() {
     }
 
     function assertConsistencyByDecoding() {
-      var actualDataMaybe = Driver.decode(presentation);
+      var actualDataMaybe = CustomDriver.decode(presentation);
 
       assert.equal(actualDataMaybe.isJust, true);
 
       var actualData = actualDataMaybe.get();
 
-      var actualPresentationMaybe = Driver.encode(actualData);
+      var actualPresentationMaybe = CustomDriver.encode(actualData);
 
       assert.equal(actualPresentationMaybe.isJust, true);
 
@@ -48,7 +48,7 @@ describe('Driver @ consistency', function() {
   };
 
   for (var i = 0; i < Assets.size; i++) {
-    var asset = Assets.assets[i];
+    var asset = Assets.customAssets[i];
 
     assertConsistency(asset.name, asset.data, asset.presentation);
   }

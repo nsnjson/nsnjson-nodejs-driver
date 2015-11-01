@@ -3,8 +3,5 @@
 
   "data": false,
 
-  "presentation": {
-    "t": 3,
-    "v": 0
-  }
+  "presentation": ["boolean", 0]
 }

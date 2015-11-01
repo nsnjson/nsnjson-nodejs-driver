@@ -2,11 +2,36 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
-function decodeNull(context) {
+var Types = require('./nsnjson.types');
+
+function Decoding() {}
+
+Decoding.prototype.getType = function(presentation) {
+  switch (presentation.t) {
+    case Format.TYPE_MARKER_NULL:    return Maybe.Just(Types.NULL);
+    case Format.TYPE_MARKER_NUMBER:  return Maybe.Just(Types.NUMBER);
+    case Format.TYPE_MARKER_STRING:  return Maybe.Just(Types.STRING);
+    case Format.TYPE_MARKER_BOOLEAN: return Maybe.Just(Types.BOOLEAN);
+    case Format.TYPE_MARKER_ARRAY:   return Maybe.Just(Types.ARRAY);
+    case Format.TYPE_MARKER_OBJECT:  return Maybe.Just(Types.OBJECT);
+  }
+
+  return Maybe.Nothing();
+}
+
+Decoding.prototype.decodeNull = function() {
   return Maybe.Just(null);
 }
 
-function decodeBoolean(context, presentation) {
+Decoding.prototype.decodeNumber =  function(presentation) {
+  return Maybe.Just(presentation.v);
+}
+
+Decoding.prototype.decodeString = function(presentation) {
+  return Maybe.Just(presentation.v);
+}
+
+Decoding.prototype.decodeBoolean = function(presentation) {
   if (presentation.v == 1) {
     return Maybe.Just(true);
   }
@@ -16,25 +41,17 @@ function decodeBoolean(context, presentation) {
   }
 
   return Maybe.Nothing();
-};
+}
 
-function decodeNumber(context, presentation) {
-  return Maybe.Just(presentation.v);
-};
-
-function decodeString(context, presentation) {
-  return Maybe.Just(presentation.v);
-};
-
-function decodeArray(context, presentation) {
+Decoding.prototype.decodeArray = function(presentation) {
   var array = [];
 
-  var encodedItems = presentation.v;
+  var itemsPresentation = presentation.v;
 
-  for (var i = 0, size = encodedItems.length; i < size; i++) {
-    var encodedItem = encodedItems[i];
+  for (var i = 0, size = itemsPresentation.length; i < size; i++) {
+    var itemPresentation = itemsPresentation[i];
 
-    var itemMaybe = decode(context, encodedItem);
+    var itemMaybe = this.decode(itemPresentation);
 
     if (itemMaybe.isJust) {
       var item = itemMaybe.get();
@@ -44,22 +61,22 @@ function decodeArray(context, presentation) {
   }
 
   return Maybe.Just(array);
-};
+}
 
-function decodeObject(context, presentation) {
+Decoding.prototype.decodeObject = function(presentation) {
   var object = {};
 
-  var encodedFields = presentation.v;
+  var fieldsPresentation = presentation.v;
 
-  for (var i = 0, size = encodedFields.length; i < size; i++) {
-    var encodedField = encodedFields[i];
+  for (var i = 0, size = fieldsPresentation.length; i < size; i++) {
+    var fieldPresentation = fieldsPresentation[i];
 
-    var fieldValueMaybe = decode(context, encodedField);
+    var name = fieldPresentation.n;
 
-    if (fieldValueMaybe.isJust) {
-      var value = fieldValueMaybe.get();
+    var valueMaybe = this.decode(fieldPresentation);
 
-      var name = encodedField.n;
+    if (valueMaybe.isJust) {
+      var value = valueMaybe.get();
 
       object[name] = value;
     }
@@ -68,92 +85,56 @@ function decodeObject(context, presentation) {
   return Maybe.Just(object);
 };
 
-function decode(context, presentation) {
-  var resolvers = context.resolvers;
+Decoding.prototype.decode = function(presentation) {
+  var typeOption = this.getType(presentation);
 
-  for (var resolverName in resolvers) {
-    if (resolvers.hasOwnProperty(resolverName)) {
-      var resolver = resolvers[resolverName];
+  if (typeOption.isJust) {
+    var type = typeOption.get();
 
-      if (resolver.checker(presentation)) {
-        return resolver.decoder(context, presentation);
-      }
+    switch (type) {
+      case Types.NULL:    return this.decodeNull();
+      case Types.NUMBER:  return this.decodeNumber(presentation);
+      case Types.STRING:  return this.decodeString(presentation);
+      case Types.BOOLEAN: return this.decodeBoolean(presentation);
+      case Types.ARRAY:   return this.decodeArray(presentation);
+      case Types.OBJECT:  return this.decodeObject(presentation);
     }
   }
 
   return Maybe.Nothing();
-};
+}
 
 module.exports = {
-  decode: function(presentation, customResolvers) {
-    function checkerByType(type) {
-      return function(presentation) {
-        return presentation.t == type;
-      };
-    }
+  decode: function(presentation, options) {
+    var decodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
-    var context = {
-      resolvers: {
-        'null': {
-          checker: checkerByType(Format.TYPE_MARKER_NULL),
-          decoder: decodeNull
-        },
-        'number': {
-          checker: checkerByType(Format.TYPE_MARKER_NUMBER),
-          decoder: decodeNumber
-        },
-        'string': {
-          checker: checkerByType(Format.TYPE_MARKER_STRING),
-          decoder: decodeString
-        },
-        'boolean': {
-          checker: checkerByType(Format.TYPE_MARKER_BOOLEAN),
-          decoder: decodeBoolean
-        },
-        'array': {
-          checker: checkerByType(Format.TYPE_MARKER_ARRAY),
-          decoder: decodeArray
-        },
-        'object': {
-          checker: checkerByType(Format.TYPE_MARKER_OBJECT),
-          decoder: decodeObject
-        }
+    var decoding = new Decoding();
+
+    if (options && (options instanceof Object)) {
+      if (options.hasOwnProperty('type')) {
+        decoding.getType = options['type'];
       }
-    };
 
-    if (customResolvers && (customResolvers instanceof Object)) {
-      function installCustomResolver(resolverName) {
-        if (context.resolvers.hasOwnProperty(resolverName) && customResolvers.hasOwnProperty(resolverName)) {
-          var customResolver = customResolvers[resolverName];
+      for (var i = 0, decodersNamesCount = decodersNames.length; i < decodersNamesCount; i++) {
+        var decoderName = decodersNames[i];
 
-          if (customResolver instanceof Object) {
-            if (customResolver.hasOwnProperty('checker')) {
-              var customResolverChecker = customResolver.checker;
+        if (options.hasOwnProperty(decoderName)) {
+          var customDecoder = options[decoderName];
 
-              if (customResolverChecker instanceof Function) {
-                context.resolvers[resolverName].checker = customResolver.checker;
-              }
-            }
-
-            if (customResolver.hasOwnProperty('decoder')) {
-              var customResolverChecker = customResolver.decoder;
-
-              if (customResolverChecker instanceof Function) {
-                context.resolvers[resolverName].decoder = customResolver.decoder;
-              }
+          if (customDecoder instanceof Function) {
+            switch (decoderName) {
+              case Types.NULL:    decoding.decodeNull    = customDecoder; break;
+              case Types.NUMBER:  decoding.decodeNumber  = customDecoder; break;
+              case Types.STRING:  decoding.decodeString  = customDecoder; break;
+              case Types.BOOLEAN: decoding.decodeBoolean = customDecoder; break;
+              case Types.ARRAY:   decoding.decodeArray   = customDecoder; break;
+              case Types.OBJECT:  decoding.decodeObject  = customDecoder; break;
             }
           }
         }
       }
-
-      installCustomResolver('null');
-      installCustomResolver('number');
-      installCustomResolver('string');
-      installCustomResolver('boolean');
-      installCustomResolver('array');
-      installCustomResolver('object');
     }
 
-    return decode(context, presentation);
+    return decoding.decode(presentation);
   }
 };
