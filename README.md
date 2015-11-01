@@ -46,14 +46,14 @@ The driver uses [**data.maybe**](https://github.com/folktale/data.maybe) as a wr
 ```javascript
 var nsnjson = require('nsnjson-driver');
 
-var json = null;
+var data = null;
 
-var encodedJSON = nsnjson.encode(json);
+var presentationMaybe = nsnjson.encode(data);
 
-console.log(encodedJSON);
-// Maybe { value: { "t": "null" } }
+console.log(presentationMaybe);
+// Maybe { value: { "t": 0 } }
 
-console.log(nsnjson.decode(encodedJSON.get()));
+console.log(nsnjson.decode(presentationMaybe.get()));
 // Maybe { value: null }
 ```
 
@@ -61,8 +61,8 @@ console.log(nsnjson.decode(encodedJSON.get()));
 
 Start from 0.0.3, you can define your own rules for JSON encoding/decoding.
 Just pass custom rules as an argument to related functions:
-- *nsnjson.encoder @ encode(value, customResolvers)*
-- *nsnjson.encoder @ decode(presentation, customResolvers)*
+- *nsnjson.encoder @ encode(data, options)*
+- *nsnjson.encoder @ decode(presentation, options)*
 
 Example:
 ```javascript
