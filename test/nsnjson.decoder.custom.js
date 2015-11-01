@@ -2,6 +2,8 @@ var Maybe = require('data.maybe');
 
 var Types = require('../src/nsnjson.types');
 
+var Decoder = require('../src/nsnjson.decoder');
+
 var decoderOptions = {
   'type': function(presentation) {
     return Maybe.Just(presentation[0]);
@@ -74,4 +76,8 @@ decoderOptions[Types.OBJECT] = function(presentation) {
   return Maybe.Just(object);
 }
 
-module.exports = decoderOptions;
+module.exports = {
+  decode: function(presentation) {
+    return Decoder.decode(presentation, decoderOptions);
+  }
+};
