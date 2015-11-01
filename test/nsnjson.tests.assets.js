@@ -4,13 +4,16 @@ var assetsCount = 11;
 
 var assets = [];
 
-for (var i = 1; i <= assetsCount; i++) {
-  var asset = require(path + 'asset' + i);
+var customAssets = [];
 
-  assets.push(asset);
+for (var i = 1; i <= assetsCount; i++) {
+  assets.push(require(path + 'asset' + i + '.json'));
+
+  customAssets.push(require(path + 'custom.asset' + i + '.json'));
 }
 
 module.exports = {
   size: assetsCount,
-  assets: assets
+  assets: assets,
+  customAssets: customAssets
 };
