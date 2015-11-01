@@ -115,21 +115,21 @@ Decoding.prototype.decode = function(presentation) {
 }
 
 module.exports = {
-  decode: function(presentation, customDecoders) {
+  decode: function(presentation, options) {
     var decodersNames = ['null', 'number', 'string','boolean', 'array', 'object'];
 
     var decoding = new Decoding();
 
-    if (customDecoders && (customDecoders instanceof Object)) {
-      if (customDecoders.hasOwnProperty('type')) {
-        decoding.getType = customDecoders['type'];
+    if (options && (options instanceof Object)) {
+      if (options.hasOwnProperty('type')) {
+        decoding.getType = options['type'];
       }
 
       for (var i = 0, decodersNamesCount = decodersNames.length; i < decodersNamesCount; i++) {
         var decoderName = decodersNames[i];
 
-        if (customDecoders.hasOwnProperty(decoderName)) {
-          var customDecoder = customDecoders[decoderName];
+        if (options.hasOwnProperty(decoderName)) {
+          var customDecoder = options[decoderName];
 
           if (customDecoder instanceof Function) {
             switch (decoderName) {
