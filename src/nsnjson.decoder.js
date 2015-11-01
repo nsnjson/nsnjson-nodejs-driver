@@ -123,12 +123,12 @@ module.exports = {
 
           if (customDecoder instanceof Function) {
             switch (decoderName) {
-              case Types.NULL:    decoding.decodeNull = customDecoder; break;
-              case Types.NUMBER:  decoding.decodeNumber = customDecoder; break;
-              case Types.STRING:  decoding.decodeString = customDecoder; break;
+              case Types.NULL:    decoding.decodeNull    = customDecoder; break;
+              case Types.NUMBER:  decoding.decodeNumber  = customDecoder; break;
+              case Types.STRING:  decoding.decodeString  = customDecoder; break;
               case Types.BOOLEAN: decoding.decodeBoolean = customDecoder; break;
-              case Types.ARRAY:   decoding.decodeArray = customDecoder; break;
-              case Types.OBJECT:  decoding.decodeObject = customDecoder; break;
+              case Types.ARRAY:   decoding.decodeArray   = customDecoder; break;
+              case Types.OBJECT:  decoding.decodeObject  = customDecoder; break;
             }
           }
         }
