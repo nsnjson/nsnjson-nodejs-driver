@@ -2,60 +2,71 @@ var Assert = require('assert');
 
 var Encoder = require('../src/nsnjson.encoder');
 
+var Types = require('../src/nsnjson.types');
+
 var Maybe = require('data.maybe');
 
 describe('Encoder @ encode (custom)', function() {
 
-  function typeDetector(value, typeName) {
-    return Object.prototype.toString.call(value).toLowerCase().indexOf(typeName) != (-1);
+  var encoderOptions = {};
+
+  encoderOptions[Types.NULL] = function() {
+    return Maybe.Just([Types.NULL]);
   }
 
-  var customResolvers = {
-    'null': function() { return Maybe.Just(['null']); },
-    'number': function(value) { return Maybe.Just(['number', value]); },
-    'string': function(value) { return Maybe.Just(['string', value]); },
-    'boolean': function(value) { return Maybe.Just(['boolean', ~~value]); },
-    'array': function(array) {
-        var itemsPresentation = [];
+  encoderOptions[Types.NUMBER] = function(value) {
+    return Maybe.Just([Types.NUMBER, value]);
+  }
 
-        for (var i = 0, size = array.length; i < size; i++) {
-          var itemPresentationMaybe = this.encode(array[i]);
+  encoderOptions[Types.STRING] = function(value) {
+    return Maybe.Just([Types.STRING, value]);
+  }
 
-          if (itemPresentationMaybe.isJust) {
-            var itemPresentation = itemPresentationMaybe.get();
+  encoderOptions[Types.BOOLEAN] = function(value) {
+    return Maybe.Just([Types.BOOLEAN, ~~value]);
+  }
 
-            itemsPresentation.push(itemPresentation);
-          }
-        }
+  encoderOptions[Types.ARRAY] = function(array) {
+    var itemsPresentation = [];
 
-        return Maybe.Just(['array', itemsPresentation]);
-    },
-    'object': function(object) {
-        var fieldsPresentation = [];
+    for (var i = 0, size = array.length; i < size; i++) {
+      var itemPresentationMaybe = this.encode(array[i]);
 
-        for (var name in object) {
-          if (object.hasOwnProperty(name)) {
-            var valuePresentationMaybe = this.encode(object[name]);
+      if (itemPresentationMaybe.isJust) {
+        var itemPresentation = itemPresentationMaybe.get();
 
-            if (valuePresentationMaybe.isJust) {
-              var valuePresentation = valuePresentationMaybe.get();
-
-              var fieldPresentation = valuePresentation.slice();
-
-              fieldPresentation.push(name);
-
-              fieldsPresentation.push(fieldPresentation);
-            }
-          }
-        }
-
-        return Maybe.Just(['object', fieldsPresentation]);
+        itemsPresentation.push(itemPresentation);
       }
-  };
+    }
 
-  function testEncoding(value, presentation) {
-    it(JSON.stringify(value), function() {
-      var actualPresentationMaybe = Encoder.encode(value, customResolvers);
+    return Maybe.Just([Types.ARRAY, itemsPresentation]);
+  }
+
+  encoderOptions[Types.OBJECT] = function(object) {
+    var fieldsPresentation = [];
+
+    for (var name in object) {
+      if (object.hasOwnProperty(name)) {
+        var valuePresentationMaybe = this.encode(object[name]);
+
+        if (valuePresentationMaybe.isJust) {
+          var valuePresentation = valuePresentationMaybe.get();
+
+          var fieldPresentation = valuePresentation.slice();
+
+          fieldPresentation.push(name);
+
+          fieldsPresentation.push(fieldPresentation);
+        }
+      }
+    }
+
+    return Maybe.Just([Types.OBJECT, fieldsPresentation]);
+  }
+
+  function testEncoding(name, json, presentation) {
+    it(name, function() {
+      var actualPresentationMaybe = Encoder.encode(json, encoderOptions);
 
       Assert.equal(actualPresentationMaybe.isJust, true);
 
@@ -63,48 +74,61 @@ describe('Encoder @ encode (custom)', function() {
 
       Assert.deepEqual(presentation, actualPresentation);
     });
-  };
+  }
 
-  testEncoding(
+  testEncoding('null',
     null,
 
     ['null']
   );
 
-  testEncoding(
-    1007,
+  testEncoding('number / int',
+    2015,
 
-    ['number', 1007]
+    ['number', 2015]
   );
 
-  testEncoding(
+  testEncoding('number / double',
+    10.26,
+
+    ['number', 10.26]
+  );
+
+  testEncoding('string / empty',
+    '',
+
+    ['string', '']
+  );
+
+  testEncoding('string',
     'nsnjson',
 
     ['string', 'nsnjson']
   );
 
-  testEncoding(
+  testEncoding('boolean / true',
     true,
 
     ['boolean', 1]
   );
 
-  testEncoding(
+  testEncoding('boolean / false',
     false,
 
     ['boolean', 0]
   );
 
-  testEncoding(
+  testEncoding('array / empty',
     [],
 
     ['array', []]
   );
 
-  testEncoding(
+  testEncoding('array',
     [
       null,
-      1007,
+      2015,
+      10.26,
       'nsnjson',
       true,
       false
@@ -112,23 +136,25 @@ describe('Encoder @ encode (custom)', function() {
 
     ['array', [
       ['null'],
-      ['number', 1007],
+      ['number', 2015],
+      ['number', 10.26],
       ['string', 'nsnjson'],
       ['boolean', 1],
       ['boolean', 0]
     ]]
   );
 
-  testEncoding(
+  testEncoding('object / empty',
     {},
 
     ['object', []]
   );
 
-  testEncoding(
+  testEncoding('object',
     {
       null_field: null,
-      number_field: 1007,
+      int_field: 2015,
+      double_field: 10.26,
       string_field: 'nsnjson',
       true_field: true,
       false_field: false
@@ -136,7 +162,8 @@ describe('Encoder @ encode (custom)', function() {
 
     ['object', [
       ['null', 'null_field'],
-      ['number', 1007, 'number_field'],
+      ['number', 2015, 'int_field'],
+      ['number', 10.26, 'double_field'],
       ['string', 'nsnjson', 'string_field'],
       ['boolean', 1, 'true_field'],
       ['boolean', 0, 'false_field']
