@@ -6,28 +6,28 @@ var Types = require('./nsnjson.types');
 
 function Encoding() {}
 
-Encoding.isNull = function(json) {
-  return (json == null);
+Encoding.isNull = function(data) {
+  return (data == null);
 }
 
-Encoding.isBoolean = function(json) {
-  return (typeof(json) == 'boolean') || (json instanceof Boolean);
+Encoding.isBoolean = function(data) {
+  return (typeof(data) == 'boolean') || (data instanceof Boolean);
 }
 
-Encoding.isNumber = function(json) {
-  return (typeof(json) == 'number') || (json instanceof Number);
+Encoding.isNumber = function(data) {
+  return (typeof(data) == 'number') || (data instanceof Number);
 }
 
-Encoding.isString = function(json) {
-  return (typeof(json) == 'string') || (json instanceof String);
+Encoding.isString = function(data) {
+  return (typeof(data) == 'string') || (data instanceof String);
 }
 
-Encoding.isArray = function(json) {
-  return (json instanceof Array);
+Encoding.isArray = function(data) {
+  return (data instanceof Array);
 }
 
-Encoding.isObject = function(json) {
-  return (json instanceof Object);
+Encoding.isObject = function(data) {
+  return (data instanceof Object);
 }
 
 Encoding.prototype.encodeNull = function() {
@@ -109,36 +109,36 @@ Encoding.prototype.encodeObject = function(object) {
   });
 }
 
-Encoding.prototype.encode = function(json) {
-  if (Encoding.isNull(json)) {
+Encoding.prototype.encode = function(data) {
+  if (Encoding.isNull(data)) {
     return this.encodeNull();
   }
 
-  if (Encoding.isNumber(json)) {
-    return this.encodeNumber(json);
+  if (Encoding.isNumber(data)) {
+    return this.encodeNumber(data);
   }
 
-  if (Encoding.isString(json)) {
-    return this.encodeString(json);
+  if (Encoding.isString(data)) {
+    return this.encodeString(data);
   }
 
-  if (Encoding.isBoolean(json)) {
-    return this.encodeBoolean(json);
+  if (Encoding.isBoolean(data)) {
+    return this.encodeBoolean(data);
   }
 
-  if (Encoding.isArray(json)) {
-    return this.encodeArray(json);
+  if (Encoding.isArray(data)) {
+    return this.encodeArray(data);
   }
 
-  if (Encoding.isObject(json)) {
-    return this.encodeObject(json);
+  if (Encoding.isObject(data)) {
+    return this.encodeObject(data);
   }
 
   return Maybe.Nothing();
 }
 
 module.exports = {
-  encode: function(json, options) {
+  encode: function(data, options) {
     var encodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
     var encoding = new Encoding();
@@ -164,6 +164,6 @@ module.exports = {
       }
     }
 
-    return encoding.encode(json);
+    return encoding.encode(data);
   }
 };
