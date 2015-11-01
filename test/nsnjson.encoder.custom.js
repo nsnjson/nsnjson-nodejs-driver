@@ -2,6 +2,8 @@ var Maybe = require('data.maybe');
 
 var Types = require('../src/nsnjson.types');
 
+var Encoder = require('../src/nsnjson.encoder');
+
 var encoderOptions = {};
 
 encoderOptions[Types.NULL] = function() {
@@ -58,4 +60,8 @@ encoderOptions[Types.OBJECT] = function(object) {
   return Maybe.Just([Types.OBJECT, fieldsPresentation]);
 }
 
-module.exports = encoderOptions;
+module.exports = {
+  encode: function(data) {
+    return Encoder.encode(data, encoderOptions);
+  }
+};
