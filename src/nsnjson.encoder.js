@@ -136,17 +136,17 @@ Encoding.prototype.encode = function(json) {
 }
 
 module.exports = {
-  encode: function(json, customEncoders) {
+  encode: function(json, options) {
     var encodersNames = ['null', 'number', 'string', 'boolean', 'array', 'object'];
 
     var encoding = new Encoding();
 
-    if (customEncoders && (customEncoders instanceof Object)) {
+    if (options && (options instanceof Object)) {
       for (var i = 0, encodersNamesCount = encodersNames.length; i < encodersNamesCount; i++) {
         var encoderName = encodersNames[i];
 
-        if (customEncoders.hasOwnProperty(encoderName)) {
-          var customEncoder = customEncoders[encoderName];
+        if (options.hasOwnProperty(encoderName)) {
+          var customEncoder = options[encoderName];
 
           if (customEncoder instanceof Function) {
             switch (encoderName) {
