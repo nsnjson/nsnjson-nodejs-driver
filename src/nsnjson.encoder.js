@@ -2,186 +2,178 @@ var Maybe = require('data.maybe');
 
 var Format = require('./nsnjson.format');
 
-function encodeNull(context) {
+function Encoding() {}
+
+Encoding.isNull = function(json) {
+  return (json == null);
+}
+
+Encoding.isBoolean = function(json) {
+  return (typeof(json) == 'boolean') || (json instanceof Boolean);
+}
+
+Encoding.isNumber = function(json) {
+  return (typeof(json) == 'number') || (json instanceof Number);
+}
+
+Encoding.isString = function(json) {
+  return (typeof(json) == 'string') || (json instanceof String);
+}
+
+Encoding.isArray = function(json) {
+  return (json instanceof Array);
+}
+
+Encoding.isObject = function(json) {
+  return (json instanceof Object);
+}
+
+Encoding.prototype.encodeNull = function() {
   return Maybe.Just({
     t: Format.TYPE_MARKER_NULL
   });
-};
+}
 
-function encodeBoolean(context, value) {
-  return Maybe.Just({
-    t: Format.TYPE_MARKER_BOOLEAN,
-    v: ~~value
-  });
-};
-
-function encodeNumber(context, value) {
+Encoding.prototype.encodeNumber = function(value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_NUMBER,
     v: value
   });
-};
+}
 
-function encodeString(context, value) {
+Encoding.prototype.encodeString = function(value) {
   return Maybe.Just({
     t: Format.TYPE_MARKER_STRING,
     v: value
   });
-}; 
+}
 
-function encodeArray(context, array) {
-  var encodedItems = [];
+Encoding.prototype.encodeBoolean = function(value) {
+  return Maybe.Just({
+    t: Format.TYPE_MARKER_BOOLEAN,
+    v: ~~value
+  });
+}
+
+Encoding.prototype.encodeArray = function(array) {
+  var itemsPresentation = [];
 
   for (var i = 0, size = array.length; i < size; i++) {
-    var encodedItemMaybe = encode(context, array[i]);
+    var itemPresentationMaybe = this.encode(array[i]);
 
-    if (encodedItemMaybe.isJust) {
-      var encodedItem = encodedItemMaybe.get();
+    if (itemPresentationMaybe.isJust) {
+      var itemPresentation = itemPresentationMaybe.get();
 
-      encodedItems.push(encodedItem);
+      itemsPresentation.push(itemPresentation);
     }
   }
 
   return Maybe.Just({
     t: Format.TYPE_MARKER_ARRAY,
-    v: encodedItems
+    v: itemsPresentation
   });
-};
+}
 
-function encodeObject(context, object) {
-  var encodedFields = [];
+Encoding.prototype.encodeObject = function(object) {
+  var fieldsPresentation = [];
 
   for (var key in object) {
     if (object.hasOwnProperty(key)) {
-      var encodedValueMaybe = encode(context, object[key]);
+      var valuePresentationMaybe = this.encode(object[key]);
 
-      if (encodedValueMaybe.isJust) {
-        var encodedValue = encodedValueMaybe.get();
+      if (valuePresentationMaybe.isJust) {
+        var valuePresentation = valuePresentationMaybe.get();
 
-        var encodedField = {
-          n: key,
-          t: encodedValue.t
+        var fieldPresentation = {
+          n: key
         };
 
-        if (encodedValue.hasOwnProperty('v')) {
-          encodedField.v = encodedValue.v;
+        if (valuePresentation.hasOwnProperty('t')) {
+          fieldPresentation.t = valuePresentation.t;
         }
 
-        encodedFields.push(encodedField);
+        if (valuePresentation.hasOwnProperty('v')) {
+          fieldPresentation.v = valuePresentation.v;
+        }
+
+        fieldsPresentation.push(fieldPresentation);
       }
     }
   }
 
   return Maybe.Just({
     t: Format.TYPE_MARKER_OBJECT,
-    v: encodedFields
+    v: fieldsPresentation
   });
-};
+}
 
-function isNull(value) {
-  return (value == null);
-};
+Encoding.prototype.encode = function(json) {
+  if (Encoding.isNull(json)) {
+    return this.encodeNull();
+  }
 
-function isBoolean(value) {
-  return (typeof(value) == 'boolean') || (value instanceof Boolean);
-};
+  if (Encoding.isNumber(json)) {
+    return this.encodeNumber(json);
+  }
 
-function isNumber(value) {
-  return (typeof(value) == 'number') || (value instanceof Number);
-};
+  if (Encoding.isString(json)) {
+    return this.encodeString(json);
+  }
 
-function isString(value) {
-  return (typeof(value) == 'string') || (value instanceof String);
-};
+  if (Encoding.isBoolean(json)) {
+    return this.encodeBoolean(json);
+  }
 
-function isArray(value) {
-  return (value instanceof Array);
-};
+  if (Encoding.isArray(json)) {
+    return this.encodeArray(json);
+  }
 
-function isObject(value) {
-  return (value instanceof Object);
-};
-
-function encode(context, value) {
-  var resolvers = context.resolvers;
-
-  for (var resolverName in resolvers) {
-    if (resolvers.hasOwnProperty(resolverName)) {
-      var resolver = resolvers[resolverName];
-
-      if (resolver.checker(value)) {
-        return resolver.encoder(context, value);
-      }
-    }
+  if (Encoding.isObject(json)) {
+    return this.encodeObject(json);
   }
 
   return Maybe.Nothing();
-};
+}
 
 module.exports = {
-  encode: function(value, customResolvers) {
-    var context = {
-      resolvers: {
-        'null': {
-          checker: isNull,
-          encoder: encodeNull
-        },
-        'number': {
-          checker: isNumber,
-          encoder: encodeNumber
-        },
-        'string': {
-          checker: isString,
-          encoder: encodeString
-        },
-        'boolean': {
-          checker: isBoolean,
-          encoder: encodeBoolean
-        },
-        'array': {
-          checker: isArray,
-          encoder: encodeArray
-        },
-        'object': {
-          checker: isObject,
-          encoder: encodeObject
-        }
-      }
-    };
+  encode: function(json, customEncoders) {
+    var encodersNames = ['null', 'number', 'string', 'boolean', 'array', 'object'];
 
-    if (customResolvers && (customResolvers instanceof Object)) {
-      function installCustomResolver(resolverName) {
-        if (context.resolvers.hasOwnProperty(resolverName) && customResolvers.hasOwnProperty(resolverName)) {
-          var customResolver = customResolvers[resolverName];
+    var encoding = new Encoding();
 
-          if (customResolver instanceof Object) {
-            if (customResolver.hasOwnProperty('checker')) {
-              var customResolverChecker = customResolver.checker;
+    if (customEncoders && (customEncoders instanceof Object)) {
+      for (var i = 0, encodersNamesCount = encodersNames.length; i < encodersNamesCount; i++) {
+        var encoderName = encodersNames[i];
 
-              if (customResolverChecker instanceof Function) {
-                context.resolvers[resolverName].checker = customResolver.checker;
-              }
-            }
+        if (customEncoders.hasOwnProperty(encoderName)) {
+          var customEncoder = customEncoders[encoderName];
 
-            if (customResolver.hasOwnProperty('encoder')) {
-              var customResolverChecker = customResolver.encoder;
-
-              if (customResolverChecker instanceof Function) {
-                context.resolvers[resolverName].encoder = customResolver.encoder;
-              }
+          if (customEncoder instanceof Function) {
+            switch (encoderName) {
+              case 'null':
+                encoding.encodeNull = customEncoder;
+                break;
+              case 'number':
+                encoding.encodeNumber = customEncoder;
+                break
+              case 'string':
+                encoding.encodeString = customEncoder;
+                break;
+              case 'boolean':
+                encoding.encodeBoolean = customEncoder;
+                break;
+              case 'array':
+                encoding.encodeArray = customEncoder;
+                break;
+              case 'object':
+                encoding.encodeObject = customEncoder;
+                break;
             }
           }
         }
       }
-
-      installCustomResolver('null');
-      installCustomResolver('number');
-      installCustomResolver('string');
-      installCustomResolver('boolean');
-      installCustomResolver('array');
-      installCustomResolver('object');
     }
 
-    return encode(context, value);
+    return encoding.encode(json);
   }
 };

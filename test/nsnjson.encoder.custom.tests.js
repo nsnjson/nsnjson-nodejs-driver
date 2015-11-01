@@ -11,64 +11,46 @@ describe('Encoder @ encode (custom)', function() {
   }
 
   var customResolvers = {
-    'null': {
-      checker: function(value) { return typeDetector(value, 'null'); },
-      encoder: function(context, value) { return Maybe.Just(['null']); }
-    },
-    'number': {
-      checker: function(value) { return typeDetector(value, 'number'); },
-      encoder: function(context, value) { return Maybe.Just(['number', value]); }
-    },
-    'string': {
-      checker: function(value) { return typeDetector(value, 'string'); },
-      encoder: function(context, value) { return Maybe.Just(['string', value]); }
-    },
-    'boolean': {
-      checker: function(value) { return typeDetector(value, 'boolean'); },
-      encoder: function(context, value) { return Maybe.Just(['boolean', ~~value]); }
-    },
-    'array': {
-      checker: function(value) { return typeDetector(value, 'array'); },
-      encoder: function(context, array) {
-        var encodedItems = [];
+    'null': function() { return Maybe.Just(['null']); },
+    'number': function(value) { return Maybe.Just(['number', value]); },
+    'string': function(value) { return Maybe.Just(['string', value]); },
+    'boolean': function(value) { return Maybe.Just(['boolean', ~~value]); },
+    'array': function(array) {
+        var itemsPresentation = [];
 
         for (var i = 0, size = array.length; i < size; i++) {
-          var encodedItemMaybe = Encoder.encode(array[i], customResolvers);
+          var itemPresentationMaybe = this.encode(array[i]);
 
-          if (encodedItemMaybe.isJust) {
-            var encodedItem = encodedItemMaybe.get();
+          if (itemPresentationMaybe.isJust) {
+            var itemPresentation = itemPresentationMaybe.get();
 
-            encodedItems.push(encodedItem);
+            itemsPresentation.push(itemPresentation);
           }
         }
 
-        return Maybe.Just(['array', encodedItems]);
-      }
+        return Maybe.Just(['array', itemsPresentation]);
     },
-    'object': {
-      checker: function(value) { return typeDetector(value, 'object'); },
-      encoder: function(context, object) {
-        var encodedFields = [];
+    'object': function(object) {
+        var fieldsPresentation = [];
 
         for (var name in object) {
           if (object.hasOwnProperty(name)) {
-            var encodedValueMaybe = Encoder.encode(object[name], customResolvers);
+            var valuePresentationMaybe = this.encode(object[name]);
 
-            if (encodedValueMaybe.isJust) {
-              var encodedValue = encodedValueMaybe.get();
+            if (valuePresentationMaybe.isJust) {
+              var valuePresentation = valuePresentationMaybe.get();
 
-              var encodedField = encodedValue.slice();
+              var fieldPresentation = valuePresentation.slice();
 
-              encodedField.push(name);
+              fieldPresentation.push(name);
 
-              encodedFields.push(encodedField);
+              fieldsPresentation.push(fieldPresentation);
             }
           }
         }
 
-        return Maybe.Just(['object', encodedFields]);
+        return Maybe.Just(['object', fieldsPresentation]);
       }
-    }
   };
 
   function testEncoding(value, presentation) {
