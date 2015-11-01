@@ -5,7 +5,8 @@ var Driver = require('../src/nsnjson.driver');
 var Assets = require('./nsnjson.tests.assets');
 
 describe('Driver @ consistency', function() {
-  function testConsistency(name, data, presentation) {
+
+  function assertConsistency(name, data, presentation) {
 
     function assertConsistencyByEncoding() {
       var actualPresentationMaybe = Driver.encode(data);
@@ -49,6 +50,7 @@ describe('Driver @ consistency', function() {
   for (var i = 0; i < Assets.size; i++) {
     var asset = Assets.assets[i];
 
-    testConsistency(asset.name, asset.data, asset.presentation);
+    assertConsistency(asset.name, asset.data, asset.presentation);
   }
+
 });
