@@ -5,21 +5,19 @@ var Encoder = require('../src/nsnjson.encoder');
 var Assets = require('./nsnjson.tests.assets');
 
 describe('Encoder @ encode', function() {
-  function testEncoding(value, presentation) {
-    it(JSON.stringify(value), function() {
-      var actualPresentationMaybe = Encoder.encode(value);
+  function testEncoding(name, data, presentation) {
+    it(name, function() {
+      var actualPresentationMaybe = Encoder.encode(data);
 
       assert.equal(actualPresentationMaybe.isJust, true);
 
-      var actualPresentation = actualPresentationMaybe.get();
-
-      assert.deepEqual(presentation, actualPresentation);
+      assert.deepEqual(presentation, actualPresentationMaybe.get());
     });
   };
 
   for (var i = 0; i < Assets.size; i++) {
     var asset = Assets.assets[i];
 
-    testEncoding(asset.data, asset.presentation);
+    testEncoding(asset.name, asset.data, asset.presentation);
   }
 });
