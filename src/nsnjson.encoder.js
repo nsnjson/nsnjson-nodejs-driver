@@ -152,24 +152,12 @@ module.exports = {
 
           if (customEncoder instanceof Function) {
             switch (encoderName) {
-              case Types.NULL:
-                encoding.encodeNull = customEncoder;
-                break;
-              case Types.NUMBER:
-                encoding.encodeNumber = customEncoder;
-                break
-              case Types.STRING:
-                encoding.encodeString = customEncoder;
-                break;
-              case Types.BOOLEAN:
-                encoding.encodeBoolean = customEncoder;
-                break;
-              case Types.ARRAY:
-                encoding.encodeArray = customEncoder;
-                break;
-              case Types.OBJECT:
-                encoding.encodeObject = customEncoder;
-                break;
+              case Types.NULL:    encoding.encodeNull    = customEncoder; break;
+              case Types.NUMBER:  encoding.encodeNumber  = customEncoder; break;
+              case Types.STRING:  encoding.encodeString  = customEncoder; break;
+              case Types.BOOLEAN: encoding.encodeBoolean = customEncoder; break;
+              case Types.ARRAY:   encoding.encodeArray   = customEncoder; break;
+              case Types.OBJECT:  encoding.encodeObject  = customEncoder; break;
             }
           }
         }
