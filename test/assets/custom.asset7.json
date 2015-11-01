@@ -1,0 +1,7 @@
+{
+  "name": "boolean / false",
+
+  "data": false,
+
+  "presentation": ["boolean", 0]
+}
