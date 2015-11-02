@@ -59,10 +59,13 @@ console.log(nsnjson.decode(presentationMaybe.get()));
 
 ## Custom rules
 
-Start from 0.0.3, you can define your own rules for JSON encoding/decoding.
+You can define your own rules for JSON encoding/decoding.
+
 Just pass custom rules as an argument to related functions:
-- *nsnjson.encoder @ encode(data, options)*
-- *nsnjson.encoder @ decode(presentation, options)*
+- nsnjson.driver @ encode(JSON, options)
+- nsnjson.driver @ decode(NSNJSON, options)
+- nsnjson.encoder @ encode(JSON, options)
+- nsnjson.decider @ decode(NSNJSON, options)
 
 Example:
 ```javascript
