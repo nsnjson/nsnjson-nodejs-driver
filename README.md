@@ -65,7 +65,7 @@ Just pass custom rules as an argument to related functions:
 - nsnjson.driver @ encode(JSON, options)
 - nsnjson.driver @ decode(NSNJSON, options)
 - nsnjson.encoder @ encode(JSON, options)
-- nsnjson.decider @ decode(NSNJSON, options)
+- nsnjson.decoder @ decode(NSNJSON, options)
 
 Example:
 ```javascript
