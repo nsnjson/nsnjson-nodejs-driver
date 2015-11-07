@@ -1,3 +1,5 @@
+var Types = require('./nsnjson.types');
+
 var Encoder = require('./nsnjson.encoder');
 
 var Decoder = require('./nsnjson.decoder');
@@ -12,6 +14,8 @@ var ObjectStyleEncoding = require('./nsnjson.encoding.style.object');
  * @module Driver
  */
 module.exports = {
+  Types: Types,
+
   /**
    * @param {JSON} data any JSON data
    * @param {Object} options Encoder options
