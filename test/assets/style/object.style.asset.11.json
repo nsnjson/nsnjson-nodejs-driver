@@ -1,0 +1,46 @@
+{
+  "name": "object",
+
+  "data": {
+    "null_field": null,
+    "int_field": 2015,
+    "double_field": 10.26,
+    "string_field": "nsnjson",
+    "true_field": true,
+    "false_field": false
+  },
+
+  "presentation": {
+    "t": 5,
+    "v": [
+      {
+        "n": "null_field"
+      },
+      {
+        "n": "int_field",
+        "t": 1,
+        "v": 2015
+      },
+      {
+        "n": "double_field",
+        "t": 1,
+        "v": 10.26
+      },
+      {
+        "n": "string_field",
+        "t": 2,
+        "v": "nsnjson"
+      },
+      {
+        "n": "true_field",
+        "t": 3,
+        "v": 1
+      },
+      {
+        "n": "false_field",
+        "t": 3,
+        "v": 0
+      }
+    ]
+  }
+}

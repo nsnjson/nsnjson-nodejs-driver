@@ -1,0 +1,10 @@
+{
+  "name": "object / empty",
+
+  "data": {},
+
+  "presentation": {
+    "t": 5,
+    "v": []
+  }
+}
