@@ -21,7 +21,7 @@ ArrayStyleEncoding.prototype.encodeString = function(value) {
 }
 
 ArrayStyleEncoding.prototype.encodeBoolean = function(value) {
-  return Maybe.Just([Format.TYPE_MARKER_STRING, ~~value]);
+  return Maybe.Just([Format.TYPE_MARKER_BOOLEAN, ~~value]);
 }
 
 ArrayStyleEncoding.prototype.encodeArray = function(array) {
