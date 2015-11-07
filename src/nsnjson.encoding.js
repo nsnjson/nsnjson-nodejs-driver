@@ -28,15 +28,15 @@ Encoding.isObject = function(data) {
   return (data instanceof Object);
 }
 
-Encoding.customize = function(EncodingClass, options) {
-  var encodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
+Encoding.customize = function(EncodingClass, customEncoders) {
+  var jsonTypes = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
-  if (options && (options instanceof Object)) {
-    for (var i = 0, encodersNamesCount = encodersNames.length; i < encodersNamesCount; i++) {
-      var encoderName = encodersNames[i];
+  if (customEncoders && (customEncoders instanceof Object)) {
+    for (var i = 0, jsonTypesCount = encodersNames.length; i < jsonTypesCount; i++) {
+      var jsonType = jsonTypes[i];
 
-      if (options.hasOwnProperty(encoderName)) {
-        var customEncoder = options[encoderName];
+      if (customEncoders.hasOwnProperty(jsonTypes)) {
+        var customEncoder = customEncoders[encoderName];
 
         if (customEncoder instanceof Function) {
           switch (encoderName) {
