@@ -1,5 +1,7 @@
 var Maybe = require('data.maybe');
 
+var Types = require('./nsnjson.types');
+
 function Encoding() {}
 
 Encoding.isNull = function(data) {
@@ -24,6 +26,33 @@ Encoding.isArray = function(data) {
 
 Encoding.isObject = function(data) {
   return (data instanceof Object);
+}
+
+Encoding.customize = function(EncodingClass, options) {
+  var encodersNames = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
+
+  if (options && (options instanceof Object)) {
+    for (var i = 0, encodersNamesCount = encodersNames.length; i < encodersNamesCount; i++) {
+      var encoderName = encodersNames[i];
+
+      if (options.hasOwnProperty(encoderName)) {
+        var customEncoder = options[encoderName];
+
+        if (customEncoder instanceof Function) {
+          switch (encoderName) {
+            case Types.NULL:    EncodingClass.prototype.encodeNull    = customEncoder; break;
+            case Types.NUMBER:  EncodingClass.prototype.encodeNumber  = customEncoder; break;
+            case Types.STRING:  EncodingClass.prototype.encodeString  = customEncoder; break;
+            case Types.BOOLEAN: EncodingClass.prototype.encodeBoolean = customEncoder; break;
+            case Types.ARRAY:   EncodingClass.prototype.encodeArray   = customEncoder; break;
+            case Types.OBJECT:  EncodingClass.prototype.encodeObject  = customEncoder; break;
+          }
+        }
+      }
+    }
+  }
+
+  return new EncodingClass();
 }
 
 Encoding.prototype.encodeNull = function() {
