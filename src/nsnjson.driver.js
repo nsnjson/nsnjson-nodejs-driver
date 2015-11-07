@@ -7,10 +7,13 @@ var Encoder = require('./nsnjson.encoder');
 var Decoder = require('./nsnjson.decoder');
 
 var Encoding = require('./nsnjson.encoding');
+var Decoding = require('./nsnjson.decoding');
 
 var ArrayStyleEncoding = require('./nsnjson.encoding.style.array');
+var ArrayStyleDecoding = require('./nsnjson.decoding.style.array');
 
 var ObjectStyleEncoding = require('./nsnjson.encoding.style.object');
+var ObjectStyleDecoding = require('./nsnjson.decoding.style.object');
 
 /**
  * @module Driver
@@ -36,11 +39,19 @@ module.exports = {
     return Decoder.decode(presentation, options);
   },
 
-  encoderWithArrayStyle: function(options) {
-    return Encoding.customize(ArrayStyleEncoding, options);
+  encoderWithArrayStyle: function(customEncoders) {
+    return Encoding.customize(ArrayStyleEncoding, customEncoders);
   },
 
-  encoderWithObjectStyle: function(options) {
-    return Encoding.customize(ObjectStyleEncoding, options);
+  decoderWithArrayStyle: function(customDecoders) {
+    return Decoding.customize(ArrayStyleDecoding, customDecoders);
+  },
+
+  encoderWithObjectStyle: function(customEncoders) {
+    return Encoding.customize(ObjectStyleEncoding, customEncoders);
+  },
+
+  decoderWithObjectStyle: function(customDecoders) {
+    return Decoding.customize(ObjectStyleDecoding, customDecoders);
   }
 };
