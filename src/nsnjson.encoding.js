@@ -1,3 +1,5 @@
+var Maybe = require('data.maybe');
+
 function Encoding() {}
 
 Encoding.isNull = function(data) {
