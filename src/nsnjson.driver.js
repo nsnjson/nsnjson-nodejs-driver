@@ -1,6 +1,13 @@
 var Encoder = require('./nsnjson.encoder');
 
 var Decoder = require('./nsnjson.decoder');
+
+var Encoding = require('./nsnjson.encoding');
+
+var ObjectStyleEncoding = require('./nsnjson.encoding.style.object');
+
+var ArrayStyleEncoding = require('./nsnjson.encoding.style.array');
+
 /**
  * @module Driver
  */
@@ -19,5 +26,13 @@ module.exports = {
    */
   decode: function(presentation, options) {
     return Decoder.decode(presentation, options);
+  },
+
+  encoderWithObjectStyle: function(options) {
+    return Encoding.customize(ObjectStyleEncoding, options);
+  },
+
+  encoderWithArrayStyle: function(options) {
+    return Encoding.customize(ArrayStyleEncoding, options);
   }
 };
