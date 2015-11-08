@@ -12,7 +12,7 @@ Decoding.customize = function(DecodingClass, customDecoders) {
       var jsonType = jsonTypes[i];
 
       if (customDecoders.hasOwnProperty(jsonType)) {
-        var customDecoder = customDecoders[encoderName];
+        var customDecoder = customDecoders[jsonType];
 
         if (customDecoder instanceof Function) {
           switch (jsonType) {
