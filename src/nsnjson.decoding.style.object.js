@@ -7,39 +7,29 @@ var Types = require('./nsnjson.types');
 var Format = require('./nsnjson.format');
 
 function ObjectStyleDecoding(customTypesDecoders) {
-  this.customTypesDecoders = customTypesDecoders;
+  Decoding.call(this, customTypesDecoders);
 }
 
 ObjectStyleDecoding.prototype = Object.create(Decoding.prototype);
 
 ObjectStyleDecoding.prototype.getType = function(presentation) {
-  var customTypesDecoders = this.customTypesDecoders;
+  var customTypeMaybe = Decoding.prototype.getType.call(this, presentation);
 
-  for (var type in customTypesDecoders) {
-    if (customTypesDecoders.hasOwnProperty(type)) {
-      var customDecoder = customTypesDecoders[type];
-
-      with (customDecoder) {
-        if (detector(presentation)) {
-          return Maybe.Just(type);
-        }
-      }
+  return customTypeMaybe.orElse(function() {
+    if (!presentation.hasOwnProperty('t')) {
+      return Maybe.Just(Types.NULL);
     }
-  }
 
-  if (!presentation.hasOwnProperty('t')) {
-    return Maybe.Just(Types.NULL);
-  }
+    switch (presentation.t) {
+      case Format.TYPE_MARKER_NUMBER:  return Maybe.Just(Types.NUMBER);
+      case Format.TYPE_MARKER_STRING:  return Maybe.Just(Types.STRING);
+      case Format.TYPE_MARKER_BOOLEAN: return Maybe.Just(Types.BOOLEAN);
+      case Format.TYPE_MARKER_ARRAY:   return Maybe.Just(Types.ARRAY);
+      case Format.TYPE_MARKER_OBJECT:  return Maybe.Just(Types.OBJECT);
+    }
 
-  switch (presentation.t) {
-    case Format.TYPE_MARKER_NUMBER:  return Maybe.Just(Types.NUMBER);
-    case Format.TYPE_MARKER_STRING:  return Maybe.Just(Types.STRING);
-    case Format.TYPE_MARKER_BOOLEAN: return Maybe.Just(Types.BOOLEAN);
-    case Format.TYPE_MARKER_ARRAY:   return Maybe.Just(Types.ARRAY);
-    case Format.TYPE_MARKER_OBJECT:  return Maybe.Just(Types.OBJECT);
-  }
-
-  return Maybe.Nothing();
+    return Maybe.Nothing();
+  });
 }
 
 ObjectStyleDecoding.prototype.decodeNull = function() {
