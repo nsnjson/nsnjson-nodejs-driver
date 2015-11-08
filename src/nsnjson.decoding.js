@@ -44,7 +44,7 @@ Decoding.customize = function(DecodingClass, customDecoders) {
 }
 
 Decoding.prototype.getType = function(presentation) {
- var customTypesDecoders = this.customTypesDecoders;
+  var customTypesDecoders = this.customTypesDecoders;
 
   for (var type in customTypesDecoders) {
     if (customTypesDecoders.hasOwnProperty(type)) {
