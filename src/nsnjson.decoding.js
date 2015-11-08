@@ -5,14 +5,12 @@ var Types = require('./nsnjson.types');
 function Decoding() {}
 
 Decoding.customize = function(DecodingClass, customDecoders) {
-  var jsonTypes = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
-
   if (customDecoders && (customDecoders instanceof Object)) {
-    for (var i = 0, jsonTypesCount = jsonTypes.length; i < jsonTypesCount; i++) {
-      var jsonType = jsonTypes[i];
+    for (var i = 0; i < Types.count; i++) {
+      var type = Types.list[i];
 
       if (customDecoders.hasOwnProperty(jsonType)) {
-        var customDecoder = customDecoders[jsonType];
+        var customDecoder = customDecoders[type];
 
         if (customDecoder instanceof Function) {
           switch (jsonType) {
