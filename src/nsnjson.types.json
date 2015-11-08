@@ -4,5 +4,14 @@
   "STRING":  "string",
   "BOOLEAN": "boolean",
   "ARRAY":   "array",
-  "OBJECT":  "object"
+  "OBJECT":  "object",
+  "list": [
+    "NULL",
+    "NUMBER",
+    "STRING",
+    "BOOLEAN",
+    "ARRAY",
+    "OBJECT"
+  ],
+  "count": 6
 }
