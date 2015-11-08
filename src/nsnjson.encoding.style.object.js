@@ -4,7 +4,9 @@ var Encoding = require('./nsnjson.encoding');
 
 var Format = require('./nsnjson.format');
 
-function ObjectStyleEncoding() {}
+function ObjectStyleEncoding(customTypesEncoders) {
+  this.customTypesEncoders = customTypesEncoders;
+}
 
 ObjectStyleEncoding.prototype = Object.create(Encoding.prototype);
 

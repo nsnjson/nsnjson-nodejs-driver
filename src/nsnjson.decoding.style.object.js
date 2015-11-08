@@ -6,7 +6,9 @@ var Types = require('./nsnjson.types');
 
 var Format = require('./nsnjson.format');
 
-function ObjectStyleDecoding() {}
+function ObjectStyleDecoding(customTypesDecoders) {
+  this.customTypesDecoders = customTypesDecoders;
+}
 
 ObjectStyleDecoding.prototype = Object.create(Decoding.prototype);
 

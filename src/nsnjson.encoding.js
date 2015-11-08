@@ -2,7 +2,9 @@ var Maybe = require('data.maybe');
 
 var Types = require('./nsnjson.types');
 
-function Encoding() {}
+function Encoding(customTypesEncoders) {
+  this.customTypesEncoders = customTypesEncoders;
+}
 
 Encoding.isNull = function(data) {
   return (data == null);
@@ -29,28 +31,40 @@ Encoding.isObject = function(data) {
 }
 
 Encoding.customize = function(EncodingClass, customEncoders) {
-  if (customEncoders && (customEncoders instanceof Object)) {
-    for (var i = 0; i < Types.count; i++) {
-      var type = Types.list[i];
+  var customTypesEncoders = {};
 
+  if (customEncoders && (customEncoders instanceof Object)) {
+    for (var type in customEncoders) {
       if (customEncoders.hasOwnProperty(type)) {
         var customEncoder = customEncoders[type];
 
-        if (customEncoder instanceof Function) {
-          switch (jsonType) {
-            case Types.NULL:    EncodingClass.prototype.encodeNull    = customEncoder; break;
-            case Types.NUMBER:  EncodingClass.prototype.encodeNumber  = customEncoder; break;
-            case Types.STRING:  EncodingClass.prototype.encodeString  = customEncoder; break;
-            case Types.BOOLEAN: EncodingClass.prototype.encodeBoolean = customEncoder; break;
-            case Types.ARRAY:   EncodingClass.prototype.encodeArray   = customEncoder; break;
-            case Types.OBJECT:  EncodingClass.prototype.encodeObject  = customEncoder; break;
+        if (Types.list.indexOf(type) >= 0) {
+          if (customEncoder instanceof Function) {
+            switch (type) {
+              case Types.NULL:    EncodingClass.prototype.encodeNull    = customEncoder; break;
+              case Types.NUMBER:  EncodingClass.prototype.encodeNumber  = customEncoder; break;
+              case Types.STRING:  EncodingClass.prototype.encodeString  = customEncoder; break;
+              case Types.BOOLEAN: EncodingClass.prototype.encodeBoolean = customEncoder; break;
+              case Types.ARRAY:   EncodingClass.prototype.encodeArray   = customEncoder; break;
+              case Types.OBJECT:  EncodingClass.prototype.encodeObject  = customEncoder; break;
+            }
+          }
+        } else {
+          if (customEncoder instanceof Object) {
+            var hasDetector = customEncoder.hasOwnProperty('detector') && customEncoder.detector instanceof Function;
+
+            var hasEncoder = customEncoder.hasOwnProperty('encoder') && customEncoder.encoder instanceof Function;
+
+            if (hasDetector && hasEncoder) {
+              customTypesEncoders[type] = customEncoder;
+            }
           }
         }
       }
     }
   }
 
-  return new EncodingClass();
+  return new EncodingClass(customTypesEncoders);
 }
 
 Encoding.prototype.encodeNull = function() {
@@ -78,6 +92,20 @@ Encoding.prototype.encodeObject = function(object) {
 }
 
 Encoding.prototype.encode = function(data) {
+  var customTypesEncoders = this.customTypesEncoders;
+
+  for (var type in customTypesEncoders) {
+    if (customTypesEncoders.hasOwnProperty(type)) {
+      var customEncoder = customTypesEncoders[type];
+
+      with (customEncoder) {
+        if (detector(data)) {
+          return encoder(data);
+        }
+      }
+    }
+  }
+
   if (Encoding.isNull(data)) {
     return this.encodeNull();
   }

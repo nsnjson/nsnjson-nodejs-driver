@@ -2,31 +2,45 @@ var Maybe = require('data.maybe');
 
 var Types = require('./nsnjson.types');
 
-function Decoding() {}
+function Decoding(customTypesDecoders) {
+  this.customTypesDecoders = customTypesDecoders;
+}
 
 Decoding.customize = function(DecodingClass, customDecoders) {
-  if (customDecoders && (customDecoders instanceof Object)) {
-    for (var i = 0; i < Types.count; i++) {
-      var type = Types.list[i];
+  var customTypesDecoders = {};
 
-      if (customDecoders.hasOwnProperty(jsonType)) {
+  if (customDecoders && (customDecoders instanceof Object)) {
+    for (var type in customDecoders) {
+      if (customDecoders.hasOwnProperty(type)) {
         var customDecoder = customDecoders[type];
 
-        if (customDecoder instanceof Function) {
-          switch (jsonType) {
-            case Types.NULL:    DecodingClass.prototype.decodeNull    = customDecoder; break;
-            case Types.NUMBER:  DecodingClass.prototype.decodeNumber  = customDecoder; break;
-            case Types.STRING:  DecodingClass.prototype.decodeString  = customDecoder; break;
-            case Types.BOOLEAN: DecodingClass.prototype.decodeBoolean = customDecoder; break;
-            case Types.ARRAY:   DecodingClass.prototype.decodeArray   = customDecoder; break;
-            case Types.OBJECT:  DecodingClass.prototype.decodeObject  = customDecoder; break;
+        if (Types.list.indexOf(type) >= 0) {
+          if (customDecoder instanceof Function) {
+            switch (type) {
+              case Types.NULL:    DecodingClass.prototype.decodeNull    = customDecoder; break;
+              case Types.NUMBER:  DecodingClass.prototype.decodeNumber  = customDecoder; break;
+              case Types.STRING:  DecodingClass.prototype.decodeString  = customDecoder; break;
+              case Types.BOOLEAN: DecodingClass.prototype.decodeBoolean = customDecoder; break;
+              case Types.ARRAY:   DecodingClass.prototype.decodeArray   = customDecoder; break;
+              case Types.OBJECT:  DecodingClass.prototype.decodeObject  = customDecoder; break;
+            }
+          }
+        } else {
+          if (customDecoder instanceof Object) {
+            var hasDetector = customDecoder.hasOwnProperty('detector') && customDecoder.detector instanceof Function;
+
+            var hasDecoder = customDecoder.hasOwnProperty('decoder') && customDecoder.decoder instanceof Function;
+
+            if (hasDetector && hasDecoder) {
+              customTypesDecoders[type] = customDecoder;
+            }
           }
         }
       }
     }
   }
 
-  return new DecodingClass();
+  return new DecodingClass(customTypesDecoders);
 }
 
 Decoding.prototype.getType = function(presentation) {
@@ -58,6 +72,20 @@ Decoding.prototype.decodeObject = function(presentation) {
 };
 
 Decoding.prototype.decode = function(presentation) {
+  var customTypesDecoders = this.customTypesDecoders;
+
+  for (var type in customTypesDecoders) {
+    if (customTypesDecoders.hasOwnProperty(type)) {
+      var customDecoder = customTypesDecoders[type];
+
+      with (customDecoder) {
+        if (detector(presentation)) {
+          return decoder(presentation);
+        }
+      }
+    }
+  }
+
   var typeMaybe = this.getType(presentation);
 
   if (typeMaybe.isJust) {
