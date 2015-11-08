@@ -44,7 +44,21 @@ Decoding.customize = function(DecodingClass, customDecoders) {
 }
 
 Decoding.prototype.getType = function(presentation) {
-  throw new Error('Method { Decoding @ getType } is not implemented!');
+ var customTypesDecoders = this.customTypesDecoders;
+
+  for (var type in customTypesDecoders) {
+    if (customTypesDecoders.hasOwnProperty(type)) {
+      var customDecoder = customTypesDecoders[type];
+
+      with (customDecoder) {
+        if (detector(presentation)) {
+          return Maybe.Just(type);
+        }
+      }
+    }
+  }
+
+  return Maybe.Nothing();
 }
 
 Decoding.prototype.decodeNull = function() {
