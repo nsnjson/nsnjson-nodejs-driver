@@ -32,14 +32,14 @@ Encoding.customize = function(EncodingClass, customEncoders) {
   var jsonTypes = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
 
   if (customEncoders && (customEncoders instanceof Object)) {
-    for (var i = 0, jsonTypesCount = encodersNames.length; i < jsonTypesCount; i++) {
+    for (var i = 0, jsonTypesCount = jsonTypes.length; i < jsonTypesCount; i++) {
       var jsonType = jsonTypes[i];
 
-      if (customEncoders.hasOwnProperty(jsonTypes)) {
-        var customEncoder = customEncoders[encoderName];
+      if (customEncoders.hasOwnProperty(jsonType)) {
+        var customEncoder = customEncoders[jsonType];
 
         if (customEncoder instanceof Function) {
-          switch (encoderName) {
+          switch (jsonType) {
             case Types.NULL:    EncodingClass.prototype.encodeNull    = customEncoder; break;
             case Types.NUMBER:  EncodingClass.prototype.encodeNumber  = customEncoder; break;
             case Types.STRING:  EncodingClass.prototype.encodeString  = customEncoder; break;
