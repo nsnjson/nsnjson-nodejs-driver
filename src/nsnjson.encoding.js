@@ -29,14 +29,12 @@ Encoding.isObject = function(data) {
 }
 
 Encoding.customize = function(EncodingClass, customEncoders) {
-  var jsonTypes = [Types.NULL, Types.NUMBER, Types.STRING, Types.BOOLEAN, Types.ARRAY, Types.OBJECT];
-
   if (customEncoders && (customEncoders instanceof Object)) {
-    for (var i = 0, jsonTypesCount = jsonTypes.length; i < jsonTypesCount; i++) {
-      var jsonType = jsonTypes[i];
+    for (var i = 0; i < Types.count; i++) {
+      var type = Types.list[i];
 
-      if (customEncoders.hasOwnProperty(jsonType)) {
-        var customEncoder = customEncoders[jsonType];
+      if (customEncoders.hasOwnProperty(type)) {
+        var customEncoder = customEncoders[type];
 
         if (customEncoder instanceof Function) {
           switch (jsonType) {
