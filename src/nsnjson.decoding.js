@@ -72,9 +72,13 @@ Decoding.prototype.decodeObject = function(presentation) {
 };
 
 Decoding.prototype.decode = function(presentation) {
-  var customTypesDecoders = this.customTypesDecoders;
+  var typeMaybe = this.getType(presentation);
 
-  for (var type in customTypesDecoders) {
+  if (typeMaybe.isJust) {
+    var type = typeMaybe.get();
+
+    var customTypesDecoders = this.customTypesDecoders;
+
     if (customTypesDecoders.hasOwnProperty(type)) {
       var customDecoder = customTypesDecoders[type];
 
@@ -84,12 +88,6 @@ Decoding.prototype.decode = function(presentation) {
         }
       }
     }
-  }
-
-  var typeMaybe = this.getType(presentation);
-
-  if (typeMaybe.isJust) {
-    var type = typeMaybe.get();
 
     switch (type) {
       case Types.NULL:    return this.decodeNull();
