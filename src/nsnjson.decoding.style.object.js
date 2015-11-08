@@ -13,6 +13,20 @@ function ObjectStyleDecoding(customTypesDecoders) {
 ObjectStyleDecoding.prototype = Object.create(Decoding.prototype);
 
 ObjectStyleDecoding.prototype.getType = function(presentation) {
+  var customTypesDecoders = this.customTypesDecoders;
+
+  for (var type in customTypesDecoders) {
+    if (customTypesDecoders.hasOwnProperty(type)) {
+      var customDecoder = customTypesDecoders[type];
+
+      with (customDecoder) {
+        if (detector(presentation)) {
+          return Maybe.Just(type);
+        }
+      }
+    }
+  }
+
   if (!presentation.hasOwnProperty('t')) {
     return Maybe.Just(Types.NULL);
   }
