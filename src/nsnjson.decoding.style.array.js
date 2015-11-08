@@ -13,6 +13,20 @@ function ArrayStyleDecoding(customTypesDecoders) {
 ArrayStyleDecoding.prototype = Object.create(Decoding.prototype);
 
 ArrayStyleDecoding.prototype.getType = function(presentation) {
+  var customTypesDecoders = this.customTypesDecoders;
+
+  for (var type in customTypesDecoders) {
+    if (customTypesDecoders.hasOwnProperty(type)) {
+      var customDecoder = customTypesDecoders[type];
+
+      with (customDecoder) {
+        if (detector(presentation)) {
+          return Maybe.Just(type);
+        }
+      }
+    }
+  }
+
   if (presentation.length == 0) {
     return Maybe.Just(Types.NULL);
   }
