@@ -6,24 +6,30 @@ var Types = require('./nsnjson.types');
 
 var Format = require('./nsnjson.format');
 
-function ArrayStyleDecoding() {}
+function ArrayStyleDecoding(customTypesDecoders) {
+  Decoding.call(this, customTypesDecoders);
+}
 
 ArrayStyleDecoding.prototype = Object.create(Decoding.prototype);
 
 ArrayStyleDecoding.prototype.getType = function(presentation) {
-  if (presentation.length == 0) {
-    return Maybe.Just(Types.NULL);
-  }
+  var customTypeMaybe = Decoding.prototype.getType.call(this, presentation);
 
-  switch (presentation[0]) {
-    case Format.TYPE_MARKER_NUMBER:  return Maybe.Just(Types.NUMBER);
-    case Format.TYPE_MARKER_STRING:  return Maybe.Just(Types.STRING);
-    case Format.TYPE_MARKER_BOOLEAN: return Maybe.Just(Types.BOOLEAN);
-    case Format.TYPE_MARKER_ARRAY:   return Maybe.Just(Types.ARRAY);
-    case Format.TYPE_MARKER_OBJECT:  return Maybe.Just(Types.OBJECT);
-  }
+  return customTypeMaybe.orElse(function() {
+    if (presentation.length == 0) {
+      return Maybe.Just(Types.NULL);
+    }
 
-  return Maybe.Nothing();
+    switch (presentation[0]) {
+      case Format.TYPE_MARKER_NUMBER:  return Maybe.Just(Types.NUMBER);
+      case Format.TYPE_MARKER_STRING:  return Maybe.Just(Types.STRING);
+      case Format.TYPE_MARKER_BOOLEAN: return Maybe.Just(Types.BOOLEAN);
+      case Format.TYPE_MARKER_ARRAY:   return Maybe.Just(Types.ARRAY);
+      case Format.TYPE_MARKER_OBJECT:  return Maybe.Just(Types.OBJECT);
+    }
+
+    return Maybe.Nothing();
+  });
 }
 
 ArrayStyleDecoding.prototype.decodeNull = function() {
